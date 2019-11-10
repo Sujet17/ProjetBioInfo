@@ -2,39 +2,88 @@ package main;
 
 public class Fragment {
 	
-	private String s;
+	private int length;
+	private byte[] list;
 	
 	public Fragment(String s) {
-		this.s = s;
+		length = s.length();
+		list  = new byte[length];
+		for (int i=0; i<s.length(); i++)
+			list[i] = Fragment.byteFromChar(s.charAt(i));
 	}
 	
-	public Fragment getComplementary() {
-		StringBuilder compl = new StringBuilder();
-		for (int i=0; i<s.length(); i++) 
-			compl.append(getComplementaryChar(s.charAt(i)));
-		compl.reverse();
-		return new Fragment(compl.toString());
+	public Fragment(byte[] list, int length) {
+		this.length = length;
+		this.list = list;
 	}
 	
-	private char getComplementaryChar(char x) {
-		switch(x) {
+	public static byte byteFromChar(char c) {
+		switch(c) {
 		case 'a':
-			return 't';
-		case 't':
-			return 'a';
+			return 0;
 		case 'c':
-			return 'g';
+			return 1;
+		case 't':
+			return 2;
 		case 'g':
-			return 'c';
+			return 3;
+		case '-':
+			return 4;
 		default:
-			return 'K';
+			throw new IllegalArgumentException();
 		}
 	}
 	
+	public static char charFromByte(byte b) {
+		switch(b) {
+		case 0:
+			return 'a';
+		case 1:
+			return 'c';
+		case 2:
+			return 't';
+		case 3:
+			return 'g';
+		case 4:
+			return '-';
+		default:
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	public Fragment getComplementary() {
+		byte[] compl = new byte[length];
+		for (int i=0; i<length; i++) {
+			compl[length-i-1] = Fragment.complementaryByte(list[i]);
+		}
+		return new Fragment(compl, length);
+	}
+	
+	public static byte complementaryByte(byte b) {
+		if (b >= 0 && b < 4)
+			return (byte) ((b+2)%4);
+		else
+			throw new IllegalArgumentException();
+	}
+	
+	public int size() {
+		return length;
+	}
+	
+	public byte byteAt(int index) {
+		return list[index];
+	}
+	
+	public char charAt(int index) {
+		return Fragment.charFromByte(byteAt(index));
+	}
 	
 	@Override
 	public String toString() { 
-		return s;
+		StringBuilder builder = new StringBuilder();
+		for (int i=0; i<length; i++)
+			builder.append(charAt(i));
+		return builder.toString();
 	}
 	
 }
