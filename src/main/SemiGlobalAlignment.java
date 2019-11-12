@@ -6,14 +6,7 @@ public class SemiGlobalAlignment {
 	public static final int MATCH_SCORE = 1;
 	public static final int MISMATCH_SCORE = -1;	
 	
-	/**
-	 * The longest fragment
-	 */
 	private Fragment f1;
-	
-	/**
-	 * The shortest fragment
-	 */
 	private Fragment f2;
 	
 	/**
@@ -31,20 +24,15 @@ public class SemiGlobalAlignment {
 	 */
 	private int[][] alignmentMatrix;
 	
+	private Point maxCase;
+	
 	public SemiGlobalAlignment(Fragment f1, Fragment f2) {
 		n = f1.size();
 		m = f2.size();
 		
-		if (n > m) {
-			this.f1 = f1;
-			this.f2 = f2;
-		}
-		else {
-			this.f1 = f2;
-			this.f2 = f1;
-			n = m;
-			m = f2.size();
-		}
+		this.f1 = f1;
+		this.f2 = f2;
+		
 		alignmentMatrix = new int[n][m];
 		buildMatrix();
 	}
@@ -57,34 +45,53 @@ public class SemiGlobalAlignment {
 		for (int i=0; i<m; i++) 
 			alignmentMatrix[0][i] = 0;
 		
+		int maxScore = 0;
+		maxCase = new Point(0, 0);
+		
 		for (int i=1; i<n; i++) {
 			for (int j=1; j<m; j++) {
-				int score;
-				if (f1.byteAt(i) == f2.byteAt(j))
-					score = alignmentMatrix[i-1][j-1]+MATCH_SCORE;
-				else
-					score = alignmentMatrix[i-1][j-1]+MISMATCH_SCORE;
+				int score = alignmentMatrix[i-1][j-1] + matchValue(i, j);
 				score = Math.max(score, alignmentMatrix[i-1][j]+GAP_PENALTY);
 				score = Math.max(score, alignmentMatrix[i][j-1]+GAP_PENALTY);
+				if (score >= maxScore) {
+					maxScore = score;
+					maxCase = new Point(i, j);
+				}
 				alignmentMatrix[i][j] = score;
 			}
 		}
 	}
 	
+	private int matchValue(int x, int y) {
+		if (f1.byteAt(x) == f2.byteAt(y))
+			return MATCH_SCORE;
+		return MISMATCH_SCORE;
+	}
+	
 	/**
 	 * 
-	 * @return a tuple of three elements : 1) the max score, 2) the x-coordinate of the case where this score appears, 
-	 * 3) the y-coordinate of the same case 
+	 * @return a point which indicates the coordinates of the last case of the best alignment
 	 */
-	public int[] getMaxAlignment() {
+	private Point getLastCase() {
 		int x = 0;
 		int y = m;
 		int score = 0;
-		if (n != m) {
+		if (m < n) {
+			//Check the last column
 			for (int i=0; i<n; i++) {
 				if (alignmentMatrix[i][m] > score) {
 					x = i;
 					score = alignmentMatrix[i][m];
+				}
+			}
+		}
+		else if (n < m) {
+			//Check the last line
+			for (int i=0; i<n; i++) {
+				if (alignmentMatrix[n][i] > score) {
+					x = n;
+					y = i;
+					score = alignmentMatrix[n][i];
 				}
 			}
 		}
@@ -96,6 +103,7 @@ public class SemiGlobalAlignment {
 					score = alignmentMatrix[i][m];
 				}
 			}
+			//Check the last line
 			for (int i=0; i<n; i++) {
 				if (alignmentMatrix[n][i] > score) {
 					x = n;
@@ -103,11 +111,36 @@ public class SemiGlobalAlignment {
 					score = alignmentMatrix[n][i];
 				}
 			}
-			//Check the last line
 		}
-		int tab[] = {score, x, y};
-		return tab;
+		return new Point(x, y);
 	}
 	
+	public void buildAlignment() {
+		Point xy = getLastCase();
+		/*
+		 * Si il faut commencer a partir du max du tableau:
+		 * x = maxCase.getX()
+		 * y = maxCase.getY()
+		 */
+		
+		int x = xy.getX();
+		int y = xy.getY();
+		int score = alignmentMatrix[x][y];
+		while (x>1 && y>1) {
+			int scoreDiag = alignmentMatrix[x-1][y-1];
+			int scoreUp = alignmentMatrix[x][y-1];
+			//int scoreLeft = alignmentMatrix[x-1][y];
+			if (score == scoreDiag + matchValue(x, y)) {
+				x = x-1;
+				y = y-1;
+			}
+			else if (score == scoreUp + GAP_PENALTY) {
+				y = y-1;
+			}
+			else {
+				x = x-1;
+			}
+		}
+	}
 	
 }
