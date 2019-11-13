@@ -10,27 +10,44 @@ public class OverlapGraph {
 	
 	public OverlapGraph(FragmentList fragments) {
 		nodes = fragments;
+		for (int i=0; i<nodes.size(); i++) {
+			for (int j=0; j<nodes.size(); j++) {
+				//Voir s'il existe un arc de nodes.get(i) a nodes.get(j)
+			}
+		}
 	}
 	
 	private int getArcWeight(Fragment f1, Fragment f2) {
+
+		SemiGlobalAlignment sga = new SemiGlobalAlignment(f1, f2);
+		int weight = sga.getAlignmentFG();
+		if (weight < 0) {
+			//Gerer inclusion des fragments
+		}
+		else if (weight == 0) {
+			//Pas d'arc f1 -> f2
+		}
+		else {
+			//Instancier arc avec score obtenu
+		}
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
 	
-	private Point[] getCrescentArcs() {
+	private Arc[] getDecrescentArcs() {
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
 	
 	//Possibilite de changer la structure contenant le chemin
-	public ArrayList<Point> hamiltonPath() {
+	public ArrayList<Arc> hamiltonPath() {
 		int len = nodes.size();
 		int[] in = new int[len];
 		int[] out = new int[len];
 		
-		ArrayList<Point> path = new ArrayList<Point>();
+		ArrayList<Arc> path = new ArrayList<Arc>();
 		
 		UnionFind struct = new UnionFind(len);
 		
-		Point[] arcs = getCrescentArcs();
+		Arc[] arcs = getDecrescentArcs();
 		int numberArcs = 0;
 		
 		for (int i=0; i<numberArcs; i++) {

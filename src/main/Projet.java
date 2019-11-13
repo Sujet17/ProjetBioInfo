@@ -14,7 +14,14 @@ public class Projet {
     	System.out.println(f.getComplementary());
 
     	*/  	
-    	
+		Fragment f = new Fragment("cagcacttggattctcgg");
+		Fragment g = new Fragment("cagcgtgg");
+		
+		SemiGlobalAlignment sga = new SemiGlobalAlignment(f, g);
+		
+		System.out.println(sga);
+		
+		sga.getAlignmentGF();
     }
 	
 }

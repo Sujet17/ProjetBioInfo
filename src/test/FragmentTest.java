@@ -14,7 +14,7 @@ public class FragmentTest {
 		assertTrue(Fragment.byteFromChar('c') == 1);
 		assertTrue(Fragment.byteFromChar('t') == 2);
 		assertTrue(Fragment.byteFromChar('g') == 3);
-		assertTrue(Fragment.byteFromChar('-') == 4);		
+		assertTrue(Fragment.byteFromChar('-') == 4);	
 	}
 
 	@Test
