@@ -10,5 +10,10 @@ public class SemiGlobalAlignmentTest {
 	public void testGetMaxAlignment() {
 		fail("Not yet implemented");
 	}
+	
+	@Test
+	public void testGetMaxAlignment2() {
+		assertTrue(true);
+	}
 
 }
