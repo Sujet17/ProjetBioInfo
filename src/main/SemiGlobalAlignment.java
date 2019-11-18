@@ -53,6 +53,12 @@ public class SemiGlobalAlignment {
 		}
 	}
 	
+	/**
+	 * Check match or mismatch
+	 * @param x , index of the first value to compare
+	 * @param y , index of the second value to compare
+	 * @return true if values match, false if not
+	 */
 	private int matchValue(int x, int y) {
 		int xTest = x-1;
 		int yTest = y-1;
@@ -65,7 +71,7 @@ public class SemiGlobalAlignment {
 	 * 
 	 * @return The index of the max score on the last column
 	 */
-	private int getMaxLastColumn() {
+	public int getMaxLastColumn() {
 		int iMax = 0;
 		int score = alignmentMatrix[0][m-1];
 		//Check the last column
@@ -78,8 +84,11 @@ public class SemiGlobalAlignment {
 		return iMax;
 	}
 		
-	
-	private int getMaxLastLine() {
+	/**
+	 * 
+	 * @return the index of the maximum on last line
+	 */
+	public int getMaxLastLine() {
 		int iMax = 0;
 		int score = alignmentMatrix[n-1][0];
 		//Check the last line
@@ -92,6 +101,10 @@ public class SemiGlobalAlignment {
 		return iMax;
 	}
 	
+	/**
+	 * 
+	 * @return -1 if F is in G, 0 if no edge from F to G or score of global alignment if there is an edge from F to G
+	 */
 	public int getAlignmentFG() {
 		int iMax = getMaxLastLine();
 		// Pas d'arc f -> g
@@ -109,7 +122,10 @@ public class SemiGlobalAlignment {
 		}
 	}
 	
-	
+	/**
+	 * 
+	 * @return -1 if G is in F, 0 if no edge from G to F or score of global alignment if there is an edge from G to F
+	 */
 	public int getAlignmentGF() {
 		int iMax = getMaxLastColumn();
 		//Pas d'arc g -> f
