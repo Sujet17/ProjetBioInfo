@@ -84,6 +84,10 @@ public class SemiGlobalAlignment {
 		return iMax;
 	}
 		
+	public int[][] getMatrix() {
+		return alignmentMatrix;
+	}
+	
 	/**
 	 * 
 	 * @return the index of the maximum on last line

@@ -1,27 +1,48 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.PriorityQueue;
+
 
 public class OverlapGraph {
 
-	private FragmentList nodes;
-	private int[] successors;
+	private FragmentList fragments;	
+	private PriorityQueue<OrientedEdge> edges;
 	
+	private int[] included;
 	
 	public OverlapGraph(FragmentList fragments) {
-		nodes = fragments;
-		for (int i=0; i<nodes.size(); i++) {
-			for (int j=0; j<nodes.size(); j++) {
-				//Voir s'il existe un arc de nodes.get(i) a nodes.get(j)
+		this.fragments = fragments;
+		
+		int size = fragments.size();
+		included = new int[size];
+		for (int i=0; i<size; i++)
+			included[i] = -1;
+		
+		edges = new PriorityQueue<OrientedEdge>();		
+		
+		for (int i=0; i<size; i++) {
+			for (int j=i+1; j<size; j++) {
+				buildArcs(i, j);
 			}
 		}
 	}
 	
-	private int getArcWeight(Fragment f1, Fragment f2) {
-
-		SemiGlobalAlignment sga = new SemiGlobalAlignment(f1, f2);
+	/**
+	 * Build the 8 arcs (f1->f2, f1'->f2, f2->f1, f2->f1', ...) if they exist
+	 * @param f1
+	 * @param f2
+	 * @return
+	 */
+	private int buildArcs(int indexF, int indexG) {
+		
+		Fragment f = fragments.get(indexF);
+		Fragment g = fragments.get(indexG);
+		
+		SemiGlobalAlignment sga = new SemiGlobalAlignment(f, g);
 		int weight = sga.getAlignmentFG();
 		if (weight < 0) {
+			included[indexF] = indexG; //Ou l'inverse, il faut verifier
 			//Gerer inclusion des fragments
 		}
 		else if (weight == 0) {
@@ -33,39 +54,31 @@ public class OverlapGraph {
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
 	
-	private Arc[] getDecrescentArcs() {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
 	
 	//Possibilite de changer la structure contenant le chemin
-	public ArrayList<Arc> hamiltonPath() {
-		int len = nodes.size();
+	public ArrayList<OrientedEdge> hamiltonPath() {
+		int len = fragments.size();
 		int[] in = new int[len];
 		int[] out = new int[len];
 		
-		ArrayList<Arc> path = new ArrayList<Arc>();
+		ArrayList<OrientedEdge> path = new ArrayList<OrientedEdge>();
 		
 		UnionFind struct = new UnionFind(len);
 		
-		Arc[] arcs = getDecrescentArcs();
-		int numberArcs = 0;
-		
-		for (int i=0; i<numberArcs; i++) {
-			int f, g; 
-			f = 0;
-			g = 0;
-			//f = arcs[i].getStart();
-			//g = arcs[i].getEnd();
-			//ou un truc comme ca
+		OrientedEdge edge = edges.poll();
+		while (edge != null) {
+			int f = edge.getSource();
+			int g = edge.getDestination();
 			if (in[g] == 0 && out[f] == 0 && struct.find(f) != struct.find(g)) {
-				path.add(arcs[i]);
+				path.add(edge);
 				in[g] = 1;
 				out[f] = 1;
 				struct.union(f, g);
 			}
 			if (struct.onlyOneSet())
 				break;
-		}
+			edge = edges.poll();
+		} 
 		return path;
 	}
 }
