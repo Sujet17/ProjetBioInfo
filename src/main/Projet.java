@@ -15,7 +15,6 @@ public class Projet {
 		Fragment g = new Fragment("cagcgtgg");
 		*/
     	
-
     	//sga.getAlignmentGF();
     }
 	

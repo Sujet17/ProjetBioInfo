@@ -24,6 +24,14 @@ public class OrientedEdge implements Comparable<OrientedEdge> {
 	
 	private int weight;
 	
+	/**
+	 * 
+	 * @param source
+	 * @param destination
+	 * @param complementarySource
+	 * @param complementaryDestination
+	 * @param weight
+	 */
 	public OrientedEdge(int source, int destination, boolean complementarySource, boolean complementaryDestination, int weight) {
 		this.source = source;
 		dest = destination;

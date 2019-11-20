@@ -13,7 +13,7 @@ public class FragmentList extends ArrayList<Fragment> {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private FragmentList() {
+	public FragmentList() {
 		super();
 	}
 	
