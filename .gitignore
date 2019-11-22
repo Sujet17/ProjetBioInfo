@@ -65,6 +65,7 @@ out/
 *.ind
 *.lof
 *.lot
+*.pdf
 *.maf
 *.mtc
 *.mtc1

@@ -65,6 +65,21 @@ public class Arc implements Comparable<Arc> {
 	}
 	
 	@Override
+	public boolean equals(Object o) {
+		if (o == this)
+			return true;
+		if (o instanceof Arc) {
+			Arc other = (Arc) o;
+			return source == other.source 
+					&& dest == other.dest
+					&& complSource == other.complSource 
+					&& complDest == other.complDest
+					&& weight == other.weight;
+		}
+		return false;
+	}
+	
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(source);

@@ -18,6 +18,6 @@ Todo list
 - [ ] Liste de questions pour Clement
 
 - Contenu rapport
-- Cas derniere case
+- Numéro de groupe
 - Ameliorer byte pour stocker caractere
 - Fusion des instanciations pour deux arcs de même poids dans la methode buildArcs de la classe OverlapGraph 
