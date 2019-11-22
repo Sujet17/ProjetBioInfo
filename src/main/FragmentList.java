@@ -17,7 +17,7 @@ public class FragmentList extends ArrayList<Fragment> {
 		super();
 	}
 	
-	static FragmentList getFragmentsFromFile(String filename) {
+	public static FragmentList getFragmentsFromFile(String filename) {
 		FragmentList fragments = new FragmentList();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(filename));

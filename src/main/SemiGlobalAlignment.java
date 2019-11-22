@@ -59,7 +59,7 @@ public class SemiGlobalAlignment {
 	 * @param y , index of the second value to compare
 	 * @return true if values match, false if not
 	 */
-	private int matchValue(int x, int y) {
+	public int matchValue(int x, int y) {
 		int xTest = x-1;
 		int yTest = y-1;
 		if (f.byteAt(xTest) == g.byteAt(yTest))
@@ -75,11 +75,16 @@ public class SemiGlobalAlignment {
 		int iMax = 0;
 		int score = alignmentMatrix[0][m-1];
 		//Check the last column
-		for (int i=1; i<n; i++) {
+		for (int i=1; i<n-1; i++) {
 			if (alignmentMatrix[i][m-1] > score) {
 				iMax = i;
 				score = alignmentMatrix[i][m-1];
 			}
+		}
+		if (alignmentMatrix[n-1][m-1] > score) { //Si on se trouve sur la case en bas a droite
+			MatrixCase nextCase = getNextCase(n-1, m-1);
+			if (nextCase.getLine() != n-2 || nextCase.getColumn() != m-1)
+				iMax = n-1;
 		}
 		return iMax;
 	}
@@ -96,11 +101,16 @@ public class SemiGlobalAlignment {
 		int iMax = 0;
 		int score = alignmentMatrix[n-1][0];
 		//Check the last line
-		for (int i=1; i<m; i++) {
+		for (int i=1; i<m-1; i++) {
 			if (alignmentMatrix[n-1][i] > score) {
 				iMax = i;
 				score = alignmentMatrix[n-1][i];
 			}
+		}
+		if (alignmentMatrix[n-1][m-1] > score) { //Si on se trouve sur la case en bas a droite
+			MatrixCase nextCase = getNextCase(n-1, m-1);
+			if (nextCase.getLine() != n-1 || nextCase.getColumn() != m-2)
+				iMax = m-1;
 		}
 		return iMax;
 	}
@@ -154,25 +164,32 @@ public class SemiGlobalAlignment {
 	public MatrixCase buildAlignment(MatrixCase startCase) {
 		int i = startCase.getLine();
 		int j = startCase.getColumn();
-		while (i>=1 && j>=1) {
-			int score = alignmentMatrix[i][j];
-			
-			int scoreDiag = alignmentMatrix[i-1][j-1];
-			int scoreUp = alignmentMatrix[i-1][j];
-			//int scoreLeft = alignmentMatrix[i][y-1];
-			if (score == scoreDiag + matchValue(i, j)) {
-				i = i-1;
-				j = j-1;
-			}
-			else if (score == scoreUp + GAP_PENALTY) {
-				i = i-1;
-			}
-			else {
-				j = j-1;
-			}
+		MatrixCase nextCase = new MatrixCase(i, j);
+		
+		while (nextCase.getLine()>=1 && nextCase.getColumn()>=1) 
+			nextCase = getNextCase(nextCase.getLine(), nextCase.getColumn());
+
+		return new MatrixCase(i, j);
+	}
+	
+	private MatrixCase getNextCase(int x, int y) {
+		int i = x;
+		int j = y;
+		int score = alignmentMatrix[i][j];
+		int scoreDiag = alignmentMatrix[i-1][j-1];
+		int scoreUp = alignmentMatrix[i-1][j];
+		//int scoreLeft = alignmentMatrix[i][y-1];
+		if (score == scoreDiag + matchValue(i, j)) {
+			i = i-1;
+			j = j-1;
+		}
+		else if (score == scoreUp + GAP_PENALTY) {
+			i = i-1;
+		}
+		else {
+			j = j-1;
 		}
 		return new MatrixCase(i, j);
-		
 	}
 	
 	@Override

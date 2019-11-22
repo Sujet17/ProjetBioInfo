@@ -74,9 +74,10 @@ public class SemiGlobalAlignmentTest {
 				res2-=1;
 			}
 		}
+		
+		
 		assertEquals(res1,-2);
 		assertEquals(res2,4);
-		
 	}
 	
 	@Test

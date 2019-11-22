@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
 public class OverlapGraph {
 
 	private FragmentList fragments;	
-	private PriorityQueue<OrientedEdge> edges;
+	private PriorityQueue<Arc> arcs;
 	
 	private int[] included;
 	
@@ -19,7 +19,7 @@ public class OverlapGraph {
 		for (int i=0; i<size; i++)
 			included[i] = -1;
 		
-		edges = new PriorityQueue<OrientedEdge>();		
+		arcs = new PriorityQueue<Arc>();		
 		
 		for (int i=0; i<size; i++) {
 			for (int j=i+1; j<size; j++) {
@@ -84,60 +84,73 @@ public class OverlapGraph {
 		if (weight == -1) 
 			included[indexSource] = indexDest; //La source est incluse a la destination
 		else if (weight > 0)
-			edges.add(new OrientedEdge(indexSource, indexDest, complSource, complDest, weight));
+			arcs.add(new Arc(indexSource, indexDest, complSource, complDest, weight));
 		else if (weight < -1)
 			throw new IllegalArgumentException("Le poids d'un arc doit etre superieur a -1");
 	}
 	
-	public PriorityQueue<OrientedEdge> getEdges() {
-		return edges;
+	/*
+	 * Used for testing
+	 */
+	public PriorityQueue<Arc> getArcs() {
+		return arcs;
 	}
 	
 
-	public ArrayList<OrientedEdge> hamiltonPath() {
+	public ArrayList<Arc> hamiltonPath() {
 		int len = fragments.size();
 		int[] in = new int[len]; //in[x] = 0 si rien n'entre dans le noeud x, 1 si un arc vers x a ete choisi, 2 si un arc vers x' a ete choisi
 		int[] out = new int[len]; //out[x] = 0 si rien de sort de x, 1 si un arc sort de x, 2 si un arc sort de x'
 		
-		ArrayList<OrientedEdge> path = new ArrayList<OrientedEdge>();
+		ArrayList<Arc> path = new ArrayList<Arc>();
 		
 		UnionFind struct = new UnionFind(len);
 		
-		OrientedEdge edge = edges.poll();
-		while (edge != null) {
-			int f = edge.getSource();
-			int g = edge.getDestination();
-			if (in[g] == 0 && out[f] == 0 && struct.find(f) != struct.find(g)) {
-				path.add(edge);
-				in[g] = getVal(edge, true);
-				out[f] = getVal(edge, false);
+		manageIncludedFragments(struct);
+		
+		Arc arc = arcs.poll();
+		while (arc != null) {
+			if (isAvailableArc(struct, arc, in, out)) {
+				int f = arc.getSource();
+				int g = arc.getDestination();
+				
+				path.add(arc);
+				in[g] = getVal(arc, true);
+				out[f] = getVal(arc, false);
 				struct.union(f, g);
 			}
 			if (struct.onlyOneSet())
 				break;
-			edge = edges.poll();
+			arc = arcs.poll();
 		} 
 		return path;
 	}
 	
-	public boolean isAvailableEdge(UnionFind struct, OrientedEdge edge, int[] in, int[] out) {
-		int f = edge.getSource();
-		int g = edge.getDestination();
-		 if (included[f] == -1 && included[g] == -1 ) { //Si aucun des fragments n'est inclus dans un autre du graphe
-			if (in[g] == 0 && out[f] == 0) { //Si arc choisi ne va vers g ni ne sort de f
+	public void manageIncludedFragments(UnionFind struct) {
+		for (int i=0; i<fragments.size(); i++) {
+			if (included[i] != -1)
+				struct.union(i, included[i]);
+		}
+	}
+	
+	public boolean isAvailableArc(UnionFind struct, Arc arc, int[] in, int[] out) {
+		int f = arc.getSource();
+		int g = arc.getDestination();
+		if (included[f] == -1 && included[g] == -1 ) { //Si aucun des fragments n'est inclus dans un autre du graphe
+			if (in[g] == 0 && out[f] == 0) { //Si aucun arc choisi ne va vers g ni ne sort de f
 				/*
 				 *  Si la sortie du noeud correspond avec l'entree
 				 *  Par exemple, on ne peut pas avoir l'arc f -> g' puis l'arc g -> h
 				 */
-				if ( (out[g] == 0 || out[g] == getVal(edge, false)) && (in[f] == 0 || in[f] == getVal(edge, true)) )
+				if ( (out[g] == 0 || out[g] == getVal(arc, false)) && (in[f] == 0 || in[f] == getVal(arc, true)) )
 					return struct.find(f) != struct.find(g);
 			}
 		}
 		return false;
 	}
 	
-	private int getVal(OrientedEdge edge, boolean isSource) {
-		if ((isSource && edge.isComplSource()) || (!isSource && edge.isComplDest()))
+	private int getVal(Arc arc, boolean isSource) {
+		if ((isSource && arc.isComplSource()) || (!isSource && arc.isComplDest()))
 			return 2;
 		return 1;
 	}		

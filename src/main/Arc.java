@@ -1,6 +1,6 @@
 package main;
 
-public class OrientedEdge implements Comparable<OrientedEdge> {
+public class Arc implements Comparable<Arc> {
 	
 	/**
 	 * The index of the source node of this edge
@@ -32,7 +32,7 @@ public class OrientedEdge implements Comparable<OrientedEdge> {
 	 * @param complementaryDestination
 	 * @param weight
 	 */
-	public OrientedEdge(int source, int destination, boolean complementarySource, boolean complementaryDestination, int weight) {
+	public Arc(int source, int destination, boolean complementarySource, boolean complementaryDestination, int weight) {
 		this.source = source;
 		dest = destination;
 		complSource = complementarySource;
@@ -60,7 +60,26 @@ public class OrientedEdge implements Comparable<OrientedEdge> {
 		return weight;
 	}
 
-	public int compareTo(OrientedEdge other) {
+	public int compareTo(Arc other) {
 		return other.weight - weight;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(source);
+		if (complSource)
+			builder.append("'");
+		else
+			builder.append(" ");
+		builder.append(" ---");
+		builder.append(weight);
+		builder.append("---> ");
+		builder.append(dest);
+		if (complDest)
+			builder.append("'");
+		else
+			builder.append(" ");
+		return builder.toString();
 	}
 }
