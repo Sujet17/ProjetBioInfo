@@ -14,7 +14,7 @@ Todo list
 - [ ] Vote de consensus
 - [ ] Rapport
 - [ ] Trouver un meilleur nom pour getVal() dans la classe overlapGraph
-
+- [ ] Refaire testHamiltonPath classe overlapGraphTest
 - [ ] Liste de questions pour Clement
 
 - Contenu rapport

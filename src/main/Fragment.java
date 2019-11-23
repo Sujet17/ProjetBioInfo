@@ -1,5 +1,7 @@
 package main;
 
+import java.util.LinkedList;
+
 public class Fragment {
 	
 	private int length;
@@ -15,6 +17,13 @@ public class Fragment {
 	public Fragment(byte[] list, int length) {
 		this.length = length;
 		this.list = list;
+	}
+	
+	public Fragment(LinkedList<Byte> invertedList) {
+		length = invertedList.size();
+		list = new byte[length];		
+		for (int i=0; i<length; i++) 
+			list[i] = invertedList.pollLast();
 	}
 	
 	public static byte byteFromChar(char c) {

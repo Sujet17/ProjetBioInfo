@@ -50,8 +50,8 @@ public class OverlapGraph {
 		
 		SemiGlobalAlignment sga = new SemiGlobalAlignment(f, g);
 		
-		int weight1 = sga.getAlignmentFG();
-		int weight2 = sga.getAlignmentGF();
+		int weight1 = sga.getScoreFG(false);
+		int weight2 = sga.getScoreGF(false);
 		
 		buildArc(weight1, indexF, indexG, false, false); //f -> g
 		buildArc(weight1, indexG, indexF, true, true); // g' -> f'
@@ -62,8 +62,8 @@ public class OverlapGraph {
 		
 		SemiGlobalAlignment sga2 = new SemiGlobalAlignment(f, g.getComplementary());
 		
-		weight1 = sga2.getAlignmentFG();
-		weight2 = sga2.getAlignmentGF();
+		weight1 = sga2.getScoreFG(false);
+		weight2 = sga2.getScoreGF(false);
 
 		buildArc(weight1, indexF, indexG, false, true); // f -> g'
 		buildArc(weight1, indexG, indexF, false, true); // g -> f'
@@ -128,6 +128,7 @@ public class OverlapGraph {
 	
 	public void manageIncludedFragments(UnionFind struct) {
 		for (int i=0; i<fragments.size(); i++) {
+			System.out.print(included[i]+" ");
 			if (included[i] != -1)
 				struct.union(i, included[i]);
 		}

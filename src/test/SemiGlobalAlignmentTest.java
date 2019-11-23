@@ -94,14 +94,14 @@ public class SemiGlobalAlignmentTest {
 	
 	@Test
 	public void testAlignementFG() {
-		assertEquals(sga1Test.getAlignmentFG(), 0);
-		assertEquals(sga2Test.getAlignmentFG(), -1);
+		assertEquals(sga1Test.getScoreFG(false), 0);
+		assertEquals(sga2Test.getScoreFG(false), -1);
 	}
 	
 	@Test
 	public void testAlignementGF() {
-		assertEquals(sga1Test.getAlignmentGF(), 2);
-		assertEquals(sga2Test.getAlignmentFG(), -1);
+		assertEquals(sga1Test.getScoreGF(false), 2);
+		assertEquals(sga2Test.getScoreGF(false), -1);
 	}
 
 }
