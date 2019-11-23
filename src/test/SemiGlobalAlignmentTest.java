@@ -58,26 +58,19 @@ public class SemiGlobalAlignmentTest {
 	
 	@Test
 	public void testMatchValue() {
-		int res1 =0;
-		int res2 =0;
-		for (int i=0;i<4;i++) {
-			if(h.byteAt(i)==y.byteAt(i)) {
-				res1+=1;
-			}
-			if(h.byteAt(i)==h.byteAt(i)) {
-				res2+=1;
-			}
-			if(h.byteAt(i)!=y.byteAt(i)) {
-				res1-=1;
-			}
-			if(h.byteAt(i)!=h.byteAt(i)) {
-				res2-=1;
+		
+		for(int i=1; i<4; i++) {
+			for(int j=1; j<4 ; j++) {
+				if(i==j) {
+					assertEquals(sga2Test.matchValue(i, j),1);
+				}
 			}
 		}
+		assertEquals(sga1Test.matchValue(1, 1),-1);
+		assertEquals(sga1Test.matchValue(2, 2),1);
+		assertEquals(sga1Test.matchValue(3, 3),-1);
+		assertEquals(sga1Test.matchValue(4, 4),-1);
 		
-		
-		assertEquals(res1,-2);
-		assertEquals(res2,4);
 	}
 	
 	@Test
