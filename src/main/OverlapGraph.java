@@ -115,8 +115,8 @@ public class OverlapGraph {
 				int g = arc.getDestination();
 				
 				path.add(arc);
-				in[g] = getVal(arc, true);
-				out[f] = getVal(arc, false);
+				in[g] = getVal(arc, false);
+				out[f] = getVal(arc, true);
 				struct.union(f, g);
 			}
 			if (struct.onlyOneSet())
@@ -126,9 +126,13 @@ public class OverlapGraph {
 		return path;
 	}
 	
+	public void printIncluded() {
+		for (int i=0; i<fragments.size(); i++) 
+			System.out.print(included[i]+" ");
+	}
+	
 	public void manageIncludedFragments(UnionFind struct) {
 		for (int i=0; i<fragments.size(); i++) {
-			System.out.print(included[i]+" ");
 			if (included[i] != -1)
 				struct.union(i, included[i]);
 		}
@@ -143,7 +147,7 @@ public class OverlapGraph {
 				 *  Si la sortie du noeud correspond avec l'entree
 				 *  Par exemple, on ne peut pas avoir l'arc f -> g' puis l'arc g -> h
 				 */
-				if ( (out[g] == 0 || out[g] == getVal(arc, false)) && (in[f] == 0 || in[f] == getVal(arc, true)) )
+				if ( (out[g] == 0 || out[g] == getVal(arc, false)) && (in[f] == 0 || in[f] == getVal(arc, true)) ) 
 					return struct.find(f) != struct.find(g);
 			}
 		}

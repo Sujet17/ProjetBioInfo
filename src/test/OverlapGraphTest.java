@@ -100,21 +100,30 @@ public class OverlapGraphTest {
 	
 	@Test
 	public void testHamiltonPath() {
-		/*
+		
 		FragmentList fl = FragmentList.getFragmentsFromFile("Collections/test/collectionTest.fasta");
 		
 		OverlapGraph graph = new OverlapGraph(fl);
 		
+		/*
+		PriorityQueue<Arc> pq = new OverlapGraph(fl).getArcs();
+		Arc arc;
+		do {
+			arc = pq.poll();
+			System.out.println(arc);
+		} while (arc != null);
+		*/
+		
 		ArrayList<Arc> l = new ArrayList<Arc>();
-		l.add(new Arc(3, 1, false, false, 4));
 		l.add(new Arc(1, 4, false, false, 4));
-		l.add(new Arc(4, 2, false, false, 2));
-		l.add(new Arc(0, 3, false, false, 2));
+		l.add(new Arc(3, 2, false, false, 4));
+		l.add(new Arc(0, 1, true, false, 3));
+		l.add(new Arc(2, 0, false, true, 1));
 		
 		ArrayList<Arc> path = graph.hamiltonPath();
 		
-		assertEquals(l, path);
-		*/
+		assertEquals(path, l);
+		
 	}
 	
 }

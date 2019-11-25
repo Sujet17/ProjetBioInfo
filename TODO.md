@@ -8,13 +8,13 @@ Todo list
 - [x] Tests alignement semi-global
 - [x] Construire correctement les arcs de l'overlap graph
 - [x] Construire chemin hamitlonien sur l'overlap graph
-- [ ] Retester alignement semi-global
-- [ ] Tester chemin hamiltonien de l'overlapGraph
+- [x] Retester alignement semi-global
+- [x] Tester chemin hamiltonien de l'overlapGraph
 - [ ] Gerer les gaps
 - [ ] Vote de consensus
 - [ ] Rapport
 - [ ] Trouver un meilleur nom pour getVal() dans la classe overlapGraph
-- [ ] Refaire testHamiltonPath classe overlapGraphTest
+- [x] Refaire testHamiltonPath classe overlapGraphTest
 - [ ] Liste de questions pour Clement
 
 - Contenu rapport
