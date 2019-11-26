@@ -1,6 +1,5 @@
 package main;
 
-import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 
@@ -97,12 +96,14 @@ public class OverlapGraph {
 	}
 	
 
-	public ArrayList<Arc> hamiltonPath() {
+	public HamiltonPath getHamiltonPath() {
 		int len = fragments.size();
 		int[] in = new int[len]; //in[x] = 0 si rien n'entre dans le noeud x, 1 si un arc vers x a ete choisi, 2 si un arc vers x' a ete choisi
 		int[] out = new int[len]; //out[x] = 0 si rien de sort de x, 1 si un arc sort de x, 2 si un arc sort de x'
 		
-		ArrayList<Arc> path = new ArrayList<Arc>();
+		//ArrayList<Arc> path = new ArrayList<Arc>();
+		
+		HamiltonPath path = new HamiltonPath();
 		
 		UnionFind struct = new UnionFind(len);
 		

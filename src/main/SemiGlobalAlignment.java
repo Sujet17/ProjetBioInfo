@@ -176,10 +176,8 @@ public class SemiGlobalAlignment {
 	 */
 	private MatrixMove retrieveWordsAligned(MatrixMove start) {
 
-		//Utilisation d'une ArrayList car acces au dernier element en O(1) et pas de memoire occupee non necessairement
 		FragmentBuilder fList = new FragmentBuilder();
-		FragmentBuilder gList = new FragmentBuilder();
-		
+		FragmentBuilder gList = new FragmentBuilder();		
 		
 		for (int i=0; i<n-1-start.getLine(); i++) {
 			fList.add(f.byteAt(n-2-i));

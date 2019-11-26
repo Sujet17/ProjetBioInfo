@@ -2,13 +2,12 @@ package test;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
 import java.util.PriorityQueue;
-
 import org.junit.Test;
 
 import main.Fragment;
 import main.FragmentList;
+import main.HamiltonPath;
 import main.Arc;
 import main.OverlapGraph;
 import main.SemiGlobalAlignment;
@@ -114,13 +113,13 @@ public class OverlapGraphTest {
 		} while (arc != null);
 		*/
 		
-		ArrayList<Arc> l = new ArrayList<Arc>();
+		HamiltonPath l = new HamiltonPath();
 		l.add(new Arc(1, 4, false, false, 4));
 		l.add(new Arc(3, 2, false, false, 4));
 		l.add(new Arc(0, 1, true, false, 3));
 		l.add(new Arc(2, 0, false, true, 1));
 		
-		ArrayList<Arc> path = graph.hamiltonPath();
+		HamiltonPath path = graph.getHamiltonPath();
 		
 		assertEquals(path, l);
 		

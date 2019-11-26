@@ -6,15 +6,26 @@ public class GapPropagation {
 	
 	private FragmentList fragments;
 	
+	/*
+	private FragmentBuilder fAligned;
+	private FragmentBuilder gAligned;
+	*/
+	
+	
 	public GapPropagation(FragmentList fl) {
 		fragments = fl;
 	}
 	
-	public void propagateGaps(ArrayList<Arc> path) {
-		ArrayList<FragmentBuilder> fl;
+	public void propagateGaps(HamiltonPath path) {
+		Arc arc = path.getArc(0);
+		ArrayList<FragmentBuilder> fl = getFragmentsFromArc(arc);
 		
 		for (int i=1; i<path.size(); i++) {
-			fl = getFragmentsFromArc(path.get(i));
+			FragmentBuilder f1 = fl.get(1);
+			arc = path.getArc(arc.getDestination());
+			
+			//comparer les machins
+			
 		}
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
