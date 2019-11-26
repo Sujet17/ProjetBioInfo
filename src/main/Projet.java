@@ -12,7 +12,7 @@ public class Projet {
     	//Fragment f = new Fragment("tag");
     	//Fragment g = new Fragment("acgta");
     	Fragment f = fl.get(1);
-    	Fragment g = fl.get(2).getComplementary();
+    	Fragment g = fl.get(3).getComplementary();
     	
 		SemiGlobalAlignment sga1 = new SemiGlobalAlignment(f, g);
 		System.out.println(f);
@@ -20,14 +20,14 @@ public class Projet {
 		
 		System.out.println(sga1.getScoreFG(true));
 		
-		System.out.println(sga1.fAlignedFG);
-		System.out.println(sga1.gAlignedFG);
+		System.out.println(new Fragment(sga1.fAligned));
+		System.out.println(new Fragment(sga1.gAligned));
 		
 
 		System.out.println(sga1.getScoreGF(true));
 
-		System.out.println(sga1.fAlignedGF);
-		System.out.println(sga1.gAlignedGF);
+		System.out.println(new Fragment(sga1.fAligned));
+		System.out.println(new Fragment(sga1.gAligned));
 		
 		System.out.println("----------");
 		//System.out.println(sga1);

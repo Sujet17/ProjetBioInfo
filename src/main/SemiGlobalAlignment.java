@@ -1,7 +1,5 @@
 package main;
 
-import java.util.LinkedList;
-
 public class SemiGlobalAlignment {
 	
 	public static final int GAP_PENALTY = -2;
@@ -26,13 +24,8 @@ public class SemiGlobalAlignment {
 	 */
 	private int[][] alignmentMatrix;
 	
-	Fragment fAlignedFG;
-	Fragment gAlignedFG;
-	Fragment fAlignedGF;
-	Fragment gAlignedGF;
-	
-	private int scoreFG = -5;
-	private int scoreGF = -5;
+	FragmentBuilder fAligned;
+	FragmentBuilder gAligned;
 	
 	public SemiGlobalAlignment(Fragment f, Fragment g) {
 		n = f.size()+1;
@@ -130,35 +123,24 @@ public class SemiGlobalAlignment {
 	 * @return -1 if F is in G, 0 if no edge from F to G or score of global alignment if there is an edge from F to G
 	 */
 	public int getScoreFG(boolean saveFoundAlignment) {
-		if (scoreFG == -5) {
-			int iMax = getMaxLastLine();
-			// Pas d'arc f -> g
-			if (iMax == 0) 
-				return 0;
-			else {
-				MatrixMove startCase = new MatrixMove(n-1, iMax);
-				MatrixMove endCase;
-				if (saveFoundAlignment) {
-					LinkedList<Byte> fList = new LinkedList<Byte>();
-					LinkedList<Byte> gList = new LinkedList<Byte>();
-					
-					endCase = retrieveWordsAligned(startCase, fList, gList);
-					
-					fAlignedFG = new Fragment(fList);
-					gAlignedFG = new Fragment(gList);
-				}
-				else
-					endCase = buildAlignment(startCase, false, null, null);
-				// f -> g avec comme poids le score de l'alignement semi-global
-				if (endCase.getLine() > 0)
-					return alignmentMatrix[startCase.getLine()][startCase.getColumn()];
-				// f inclus a g
-				else 
-					return -1;
-			}
+		int iMax = getMaxLastLine();
+		// Pas d'arc f -> g
+		if (iMax == 0) 
+			return 0;
+		else {
+			MatrixMove startCase = new MatrixMove(n-1, iMax);
+			MatrixMove endCase;
+			if (saveFoundAlignment) 
+				endCase = retrieveWordsAligned(startCase);					
+			else
+				endCase = buildAlignment(startCase, false, null, null);
+			// f -> g avec comme poids le score de l'alignement semi-global
+			if (endCase.getLine() > 0)
+				return alignmentMatrix[startCase.getLine()][startCase.getColumn()];
+			// f inclus a g
+			else 
+				return -1;
 		}
-		else
-			return scoreFG;
 	}
 	
 	/**
@@ -166,41 +148,38 @@ public class SemiGlobalAlignment {
 	 * @return -1 if G is in F, 0 if no edge from G to F or score of global alignment if there is an edge from G to F
 	 */
 	public int getScoreGF(boolean saveFoundAlignment) {
-		if (scoreGF == -5) {
-			int iMax = getMaxLastColumn();
-			//Pas d'arc g -> f
-			if (iMax == 0) 
-				return 0;
-			else {
-				MatrixMove startCase = new MatrixMove(iMax, m-1);
-				MatrixMove endCase;
-				if (saveFoundAlignment) {
-					LinkedList<Byte> fList = new LinkedList<Byte>();
-					LinkedList<Byte> gList = new LinkedList<Byte>();
-					
-					endCase = retrieveWordsAligned(startCase, fList, gList);
-					
-					fAlignedGF = new Fragment(fList);
-					gAlignedGF = new Fragment(gList);
-				}
-				else
-					endCase = buildAlignment(startCase, false, null, null);
-				// g -> f
-				if (endCase.getColumn() > 0)
-					return alignmentMatrix[startCase.getLine()][startCase.getColumn()];
-				// g inclus a f
-				else 
-					return -1;
-			}
+		int iMax = getMaxLastColumn();
+		//Pas d'arc g -> f
+		if (iMax == 0) 
+			return 0;
+		else {
+			MatrixMove startCase = new MatrixMove(iMax, m-1);
+			MatrixMove endCase;
+			if (saveFoundAlignment) 
+				endCase = retrieveWordsAligned(startCase);
+			else
+				endCase = buildAlignment(startCase, false, null, null);
+			// g -> f
+			if (endCase.getColumn() > 0)
+				return alignmentMatrix[startCase.getLine()][startCase.getColumn()];
+			// g inclus a f
+			else 
+				return -1;
 		}
-		else
-			return scoreGF;
-
+	
 	}
 	
-	public MatrixMove retrieveWordsAligned(MatrixMove start, LinkedList<Byte> fList, LinkedList<Byte> gList) {
+	/**
+	 * Write the founded words on the fAligned and gAligned attributes
+	 * @param start
+	 * @return
+	 */
+	private MatrixMove retrieveWordsAligned(MatrixMove start) {
 
-		//Utilisation d'une LinkedList car acces au dernier element en O(1) et pas de memoire occupee non necessairement
+		//Utilisation d'une ArrayList car acces au dernier element en O(1) et pas de memoire occupee non necessairement
+		FragmentBuilder fList = new FragmentBuilder();
+		FragmentBuilder gList = new FragmentBuilder();
+		
 		
 		for (int i=0; i<n-1-start.getLine(); i++) {
 			fList.add(f.byteAt(n-2-i));
@@ -222,6 +201,9 @@ public class SemiGlobalAlignment {
 			gList.add(g.byteAt(i-1));
 		}
 		
+		fAligned = fList.getReverse();
+		gAligned = gList.getReverse();
+		
 		return end;
 	}
 	
@@ -229,7 +211,7 @@ public class SemiGlobalAlignment {
 	 * 
 	 * @param startCase
 	 */
-	private MatrixMove buildAlignment(MatrixMove startCase, boolean saveAlignment, LinkedList<Byte> fList, LinkedList<Byte> gList) {
+	private MatrixMove buildAlignment(MatrixMove startCase, boolean saveAlignment, FragmentBuilder fList, FragmentBuilder gList) {
 		MatrixMove nextCase = new MatrixMove(startCase.getLine(), startCase.getColumn());
 		
 		while (nextCase.getLine()>=1 && nextCase.getColumn()>=1) {
@@ -241,18 +223,18 @@ public class SemiGlobalAlignment {
 		return nextCase;
 	}
 	
-	private void manageNextCase(MatrixMove nextCase, LinkedList<Byte> fA, LinkedList<Byte> gA) {
+	private void manageNextCase(MatrixMove nextCase, FragmentBuilder fBuilder, FragmentBuilder gBuilder) {
 		if (nextCase.getMove() == MatrixMove.MoveType.LEFT) {
-			fA.add((byte)4);
-			gA.add(g.byteAt(nextCase.getColumn()-1));
+			fBuilder.add((byte)4);
+			gBuilder.add(g.byteAt(nextCase.getColumn()-1));
 		}
 		else if (nextCase.getMove() == MatrixMove.MoveType.UP) {
-			fA.add(f.byteAt(nextCase.getLine()-1));
-			gA.add((byte)4);
+			fBuilder.add(f.byteAt(nextCase.getLine()-1));
+			gBuilder.add((byte)4);
 		}
 		else {  // if (nextCase.getMove() == MatrixMove.MoveType.DIAG or nextCase.getMove() == null) 
-			fA.add(f.byteAt(nextCase.getLine()-1));
-			gA.add(g.byteAt(nextCase.getColumn()-1));
+			fBuilder.add(f.byteAt(nextCase.getLine()-1));
+			gBuilder.add(g.byteAt(nextCase.getColumn()-1));
 		}
 	}
 	
