@@ -24,6 +24,12 @@ public class Fragment {
 			list[i] = builder.get(i);
 	}
 	
+	/**
+	 * Convert char into byte
+	 * 
+	 * @param c, char to convert
+	 * @return number from 1 to 4
+	 * 	 */
 	public static byte byteFromChar(char c) {
 		switch(c) {
 		case 'a':
@@ -41,6 +47,12 @@ public class Fragment {
 		}
 	}
 	
+	/**
+	 * Convert byte into char
+	 * 
+	 * @param b, byte to convert
+	 * @return a if byte is 0, c if byte is 1, t if byte is 2, g if byte is 3, "-" if byte is 4
+	 */
 	public static char charFromByte(byte b) {
 		switch(b) {
 		case 0:
@@ -58,6 +70,10 @@ public class Fragment {
 		}
 	}
 	
+	/**
+	 * 
+	 * @return the complementary of a the fragment
+	 */
 	public Fragment getComplementary() {
 		byte[] compl = new byte[length];
 		for (int i=0; i<length; i++) {
@@ -66,6 +82,11 @@ public class Fragment {
 		return new Fragment(compl, length);
 	}
 	
+	/**
+	 * 
+	 * @param b, byte 
+	 * @return complementary of b
+	 */
 	public static byte complementaryByte(byte b) {
 		if (b >= 0 && b < 4)
 			return (byte) ((b+2)%4);
