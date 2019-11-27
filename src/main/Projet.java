@@ -4,7 +4,7 @@ public class Projet {
 	
     public static void main(String args[])
     {
-    	
+    	/*
     	System.out.println("Ca compile");
 		FragmentList fl = FragmentList.getFragmentsFromFile("Collections/test/collectionTest.fasta");
     	//System.out.println(fl);
@@ -31,13 +31,13 @@ public class Projet {
 		
 		System.out.println("----------");
 		//System.out.println(sga1);
-		
-    	/*
-		Fragment f = new Fragment("cagcacttggattctcgg");
-		Fragment g = new Fragment("cagcgtgg");
 		*/
+    
+		FragmentList fl = FragmentList.getFragmentsFromFile("Collections/10000/collection1.fasta");
+    	OverlapGraph graph = new OverlapGraph(fl);
     	
-    	//sga.getAlignmentGF();
+    	System.out.println(graph.getHamiltonPath());
+    	
     }
 	
 }

@@ -25,4 +25,9 @@ public class FragmentBuilder extends ArrayList<Byte> {
 		return builder;
 	}
 	
+	@Override
+	public String toString() {
+		return new Fragment(this).toString();
+	}
+	
 }

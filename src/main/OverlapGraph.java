@@ -44,6 +44,9 @@ public class OverlapGraph {
 	 */
 	private void buildArcs(int indexF, int indexG) {
 		
+		if (included[indexF] != -1 || included[indexG] != -1)
+			return;
+		
 		Fragment f = fragments.get(indexF);
 		Fragment g = fragments.get(indexG);
 		
@@ -52,24 +55,42 @@ public class OverlapGraph {
 		int weight1 = sga.getScoreFG(false);
 		int weight2 = sga.getScoreGF(false);
 		
+		if (weight1 == -1 || weight2 == -1) {
+			if (f.size() < g.size())
+				included[indexF] = indexG;
+			else
+				included[indexG] = indexF;
+			return ;
+		}
+		
 		buildArc(weight1, indexF, indexG, false, false); //f -> g
 		buildArc(weight1, indexG, indexF, true, true); // g' -> f'
 
 		buildArc(weight2, indexG, indexF, false, false); // g -> f
-		buildArc(weight2, indexF, indexG, true, true); // f' -> g
-
+		buildArc(weight2, indexF, indexG, true, true); // f' -> g'
+		
 		
 		SemiGlobalAlignment sga2 = new SemiGlobalAlignment(f, g.getComplementary());
 		
 		weight1 = sga2.getScoreFG(false);
 		weight2 = sga2.getScoreGF(false);
+		
+		if (weight1 == -1 || weight2 == -1) {
+			if (f.size() < g.size())
+				included[indexF] = indexG;
+			else
+				included[indexG] = indexF;
+			return ;
+		}
 
 		buildArc(weight1, indexF, indexG, false, true); // f -> g'
 		buildArc(weight1, indexG, indexF, false, true); // g -> f'
 		
 		buildArc(weight2, indexG, indexF, true, false); // g' -> f
 		buildArc(weight2, indexF, indexG, true, false); // f' -> g
+		
 	}
+	
 	
 	/**
 	 * Build the specified arc if he exists
@@ -134,9 +155,11 @@ public class OverlapGraph {
 	
 	public void manageIncludedFragments(UnionFind struct) {
 		for (int i=0; i<fragments.size(); i++) {
+			System.out.print(included[i]+" ");
 			if (included[i] != -1)
 				struct.union(i, included[i]);
 		}
+		System.out.println();
 	}
 	
 	public boolean isAvailableArc(UnionFind struct, Arc arc, int[] in, int[] out) {
