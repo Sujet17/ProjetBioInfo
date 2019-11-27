@@ -236,6 +236,12 @@ public class SemiGlobalAlignment {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	private MatrixMove getNextCase(int x, int y) {
 		int i = x;
 		int j = y;

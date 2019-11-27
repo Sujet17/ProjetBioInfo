@@ -17,6 +17,12 @@ public class FragmentList extends ArrayList<Fragment> {
 		super();
 	}
 	
+	/**
+	 * read file and convert data into fragment
+	 * 
+	 * @param filename, file to read
+	 * @return the fragments from the filename
+	 */
 	public static FragmentList getFragmentsFromFile(String filename) {
 		FragmentList fragments = new FragmentList();
 		try {

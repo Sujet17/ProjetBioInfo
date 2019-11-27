@@ -17,6 +17,10 @@ public class FragmentBuilder extends ArrayList<Byte> {
 		super(size);
 	}
 
+	/**
+	 * 
+	 * @return reversed builder
+	 */
 	public FragmentBuilder getReverse() {
 		FragmentBuilder builder = new FragmentBuilder(size());
 		int size = size();

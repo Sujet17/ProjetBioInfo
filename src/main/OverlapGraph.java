@@ -96,6 +96,10 @@ public class OverlapGraph {
 	}
 	
 
+	/**
+	 * 
+	 * @return the Hamilton Path
+	 */
 	public HamiltonPath getHamiltonPath() {
 		int len = fragments.size();
 		int[] in = new int[len]; //in[x] = 0 si rien n'entre dans le noeud x, 1 si un arc vers x a ete choisi, 2 si un arc vers x' a ete choisi
@@ -127,6 +131,9 @@ public class OverlapGraph {
 		return path;
 	}
 	
+	/**
+	 * print included fragments
+	 */
 	public void printIncluded() {
 		for (int i=0; i<fragments.size(); i++) 
 			System.out.print(included[i]+" ");
@@ -139,6 +146,14 @@ public class OverlapGraph {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param struct
+	 * @param arc
+	 * @param in
+	 * @param out
+	 * @return true if ..., false else
+	 */
 	public boolean isAvailableArc(UnionFind struct, Arc arc, int[] in, int[] out) {
 		int f = arc.getSource();
 		int g = arc.getDestination();
@@ -155,6 +170,12 @@ public class OverlapGraph {
 		return false;
 	}
 	
+	/**
+	 * 
+	 * @param arc
+	 * @param isSource
+	 * @return 2 if ..., 1 else
+	 */
 	private int getVal(Arc arc, boolean isSource) {
 		if ((isSource && arc.isComplSource()) || (!isSource && arc.isComplDest()))
 			return 2;
