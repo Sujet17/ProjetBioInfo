@@ -1,4 +1,4 @@
-package main;
+package main;;
 
 public class Projet {
 	
@@ -7,14 +7,15 @@ public class Projet {
     	/*
     	System.out.println("Ca compile");
 		FragmentList fl = FragmentList.getFragmentsFromFile("Collections/test/collectionTest.fasta");
-    	//System.out.println(fl);
-      	
-    	//Fragment f = new Fragment("tag");
-    	//Fragment g = new Fragment("acgta");
+    	
+    	//Fragment f = new Fragment("ccccccccccc");
+    	//Fragment g = new Fragment("aaaaaaaaaaaaa");
     	Fragment f = fl.get(1);
     	Fragment g = fl.get(3).getComplementary();
     	
 		SemiGlobalAlignment sga1 = new SemiGlobalAlignment(f, g);
+		System.out.println(sga1);
+		
 		System.out.println(f);
 		System.out.println(g);
 		
@@ -32,9 +33,11 @@ public class Projet {
 		System.out.println("----------");
 		//System.out.println(sga1);
 		*/
-    
-		FragmentList fl = FragmentList.getFragmentsFromFile("Collections/10000/collection1.fasta");
-    	OverlapGraph graph = new OverlapGraph(fl);
+    	
+    	
+    	FragmentList fl = FragmentList.getFragmentsFromFile("Collections/10000/collection1.fasta");
+    	
+		OverlapGraph graph = new OverlapGraph(fl);    	
     	
     	System.out.println(graph.getHamiltonPath());
     	

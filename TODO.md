@@ -10,14 +10,23 @@ Todo list
 - [x] Construire chemin hamitlonien sur l'overlap graph
 - [x] Retester alignement semi-global
 - [x] Tester chemin hamiltonien de l'overlapGraph
+- [x] Changer int an short dans les matrices de SGA
+- [x] Refaire testHamiltonPath classe overlapGraphTest
 - [ ] Gerer les gaps
 - [ ] Vote de consensus
 - [ ] Rapport
+- [ ] Multithreading pour construction des arcs : java-copy-on-write-arraylist
 - [ ] Trouver un meilleur nom pour getVal() dans la classe overlapGraph
-- [x] Refaire testHamiltonPath classe overlapGraphTest
+- [ ] Trouver structure de données adéquate pour FragmentBuilder
+- [ ] Javadoc
+- [ ] Gradle
+
 - [ ] Liste de questions pour Clement
 
-- Contenu rapport
-- Numéro de groupe
+- Propagation des gaps 
+- Vote de consensus
+- Gestion des fragments inclus
 - Ameliorer byte pour stocker caractere
-- Fusion des instanciations pour deux arcs de même poids dans la methode buildArcs de la classe OverlapGraph 
+- Contenu rapport (Numéro de groupe : 4)
+
+- Changer attribut plutôt que retourner ?

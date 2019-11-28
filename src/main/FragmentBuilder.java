@@ -1,8 +1,8 @@
 package main;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
-public class FragmentBuilder extends ArrayList<Byte> {
+public class FragmentBuilder extends LinkedList<Byte> {
 
 	/**
 	 * 
@@ -11,22 +11,6 @@ public class FragmentBuilder extends ArrayList<Byte> {
 	
 	public FragmentBuilder() {
 		super();
-	}
-	
-	public FragmentBuilder(int size) {
-		super(size);
-	}
-
-	/**
-	 * 
-	 * @return reversed builder
-	 */
-	public FragmentBuilder getReverse() {
-		FragmentBuilder builder = new FragmentBuilder(size());
-		int size = size();
-		for (int i=0; i<size; i++) 
-			builder.add(get(size-1-i));
-		return builder;
 	}
 	
 	@Override

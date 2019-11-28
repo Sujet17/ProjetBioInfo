@@ -19,7 +19,7 @@ public class SemiGlobalAlignmentTest {
 	@Test
 	public void testMatrix() {
 		
-		int[][] testMatrix = new int[5][5];
+		short[][] testMatrix = new short[5][5];
 		
 		testMatrix[0][0] = 0;
 		testMatrix[0][1] = 0;
@@ -48,7 +48,7 @@ public class SemiGlobalAlignmentTest {
 		testMatrix[4][4] = -2;
 		
 		
-		int[][] alignmentMatrix = sga1Test.getMatrix();
+		short[][] alignmentMatrix = sga1Test.getMatrix();
 		
 		for(int i =0; i<4;i++) {
 			assertArrayEquals(alignmentMatrix[i], testMatrix[i]);

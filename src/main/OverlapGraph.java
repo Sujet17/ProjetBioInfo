@@ -51,11 +51,15 @@ public class OverlapGraph {
 		Fragment g = fragments.get(indexG);
 		
 		SemiGlobalAlignment sga = new SemiGlobalAlignment(f, g);
+		SemiGlobalAlignment sga2 = new SemiGlobalAlignment(f, g.getComplementary());
 		
 		int weight1 = sga.getScoreFG(false);
 		int weight2 = sga.getScoreGF(false);
+
+		int weight3 = sga2.getScoreFG(false);
+		int weight4 = sga2.getScoreGF(false);
 		
-		if (weight1 == -1 || weight2 == -1) {
+		if (weight1 == -1 || weight2 == -1 || weight3 == -1 || weight4 == -1) {
 			if (f.size() < g.size())
 				included[indexF] = indexG;
 			else
@@ -69,25 +73,11 @@ public class OverlapGraph {
 		buildArc(weight2, indexG, indexF, false, false); // g -> f
 		buildArc(weight2, indexF, indexG, true, true); // f' -> g'
 		
+		buildArc(weight3, indexF, indexG, false, true); // f -> g'
+		buildArc(weight3, indexG, indexF, false, true); // g -> f'
 		
-		SemiGlobalAlignment sga2 = new SemiGlobalAlignment(f, g.getComplementary());
-		
-		weight1 = sga2.getScoreFG(false);
-		weight2 = sga2.getScoreGF(false);
-		
-		if (weight1 == -1 || weight2 == -1) {
-			if (f.size() < g.size())
-				included[indexF] = indexG;
-			else
-				included[indexG] = indexF;
-			return ;
-		}
-
-		buildArc(weight1, indexF, indexG, false, true); // f -> g'
-		buildArc(weight1, indexG, indexF, false, true); // g -> f'
-		
-		buildArc(weight2, indexG, indexF, true, false); // g' -> f
-		buildArc(weight2, indexF, indexG, true, false); // f' -> g
+		buildArc(weight4, indexG, indexF, true, false); // g' -> f
+		buildArc(weight4, indexF, indexG, true, false); // f' -> g
 		
 	}
 	
@@ -101,11 +91,9 @@ public class OverlapGraph {
 	 * @param complDest
 	 */
 	private void buildArc(int weight, int indexSource, int indexDest, boolean complSource, boolean complDest) {
-		if (weight == -1) 
-			included[indexSource] = indexDest; //La source est incluse a la destination
-		else if (weight > 0)
+		if (weight >= 0)
 			arcs.add(new Arc(indexSource, indexDest, complSource, complDest, weight));
-		else if (weight < -1)
+		else
 			throw new IllegalArgumentException("Le poids d'un arc doit etre superieur a -1");
 	}
 	
@@ -161,12 +149,16 @@ public class OverlapGraph {
 	}
 	
 	public void manageIncludedFragments(UnionFind struct) {
+		int cnt = 0;
 		for (int i=0; i<fragments.size(); i++) {
 			System.out.print(included[i]+" ");
-			if (included[i] != -1)
+			if (included[i] != -1) {
 				struct.union(i, included[i]);
+				cnt++;
+			}
 		}
 		System.out.println();
+		System.out.println((float)cnt/fragments.size()+" "+cnt+" "+fragments.size());
 	}
 	
 	/**

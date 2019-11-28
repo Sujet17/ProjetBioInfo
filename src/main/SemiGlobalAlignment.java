@@ -2,9 +2,9 @@ package main;
 
 public class SemiGlobalAlignment {
 	
-	public static final int GAP_PENALTY = -2;
-	public static final int MATCH_SCORE = 1;
-	public static final int MISMATCH_SCORE = -1;	
+	public static final short GAP_PENALTY = -2;
+	public static final short MATCH_SCORE = 1;
+	public static final short MISMATCH_SCORE = -1;	
 	
 	private Fragment f;
 	private Fragment g;
@@ -22,7 +22,7 @@ public class SemiGlobalAlignment {
 	/**
 	 * An n-lines m-columns matrix
 	 */
-	private int[][] alignmentMatrix;
+	private short[][] alignmentMatrix;
 	
 	FragmentBuilder fAligned;
 	FragmentBuilder gAligned;
@@ -34,7 +34,7 @@ public class SemiGlobalAlignment {
 		this.f = f;
 		this.g = g;
 		
-		alignmentMatrix = new int[n][m];
+		alignmentMatrix = new short[n][m];
 		buildMatrix();
 	}
 	
@@ -48,10 +48,10 @@ public class SemiGlobalAlignment {
 		
 		for (int i=1; i<n; i++) {
 			for (int j=1; j<m; j++) {
-				int score = alignmentMatrix[i-1][j-1] + matchValue(i, j);
+			    int score = alignmentMatrix[i-1][j-1] + matchValue(i, j);
 				score = Math.max(score, alignmentMatrix[i-1][j]+GAP_PENALTY);
 				score = Math.max(score, alignmentMatrix[i][j-1]+GAP_PENALTY);
-				alignmentMatrix[i][j] = score;
+				alignmentMatrix[i][j] = (short) score;
 			}
 		}
 	}
@@ -62,7 +62,7 @@ public class SemiGlobalAlignment {
 	 * @param y , index of the second value to compare
 	 * @return true if values match, false if not
 	 */
-	public int matchValue(int x, int y) {
+	public short matchValue(int x, int y) {
 		int xTest = x-1;
 		int yTest = y-1;
 		if (f.byteAt(xTest) == g.byteAt(yTest))
@@ -92,7 +92,7 @@ public class SemiGlobalAlignment {
 		return iMax;
 	}
 		
-	public int[][] getMatrix() {
+	public short[][] getMatrix() {
 		return alignmentMatrix;
 	}
 	
@@ -176,31 +176,28 @@ public class SemiGlobalAlignment {
 	 */
 	private MatrixMove retrieveWordsAligned(MatrixMove start) {
 
-		FragmentBuilder fList = new FragmentBuilder();
-		FragmentBuilder gList = new FragmentBuilder();		
+		fAligned = new FragmentBuilder();
+		gAligned = new FragmentBuilder();		
 		
 		for (int i=0; i<n-1-start.getLine(); i++) {
-			fList.add(f.byteAt(n-2-i));
-			gList.add((byte)4);
+			fAligned.addFirst(f.byteAt(n-2-i));
+			gAligned.addFirst((byte)4);
 		}
 		for (int i=0; i<m-1-start.getColumn(); i++) {
-			fList.add((byte)4);
-			gList.add(g.byteAt(m-2-i));
+			fAligned.addFirst((byte)4);
+			gAligned.addFirst(g.byteAt(m-2-i));
 		}
 		
-		MatrixMove end = buildAlignment(start, true, fList, gList);
+		MatrixMove end = buildAlignment(start, true, fAligned, gAligned);
 		
 		for (int i=end.getLine(); i>0; i--) {
-			fList.add(f.byteAt(i-1));
-			gList.add((byte)4);
+			fAligned.addFirst(f.byteAt(i-1));
+			gAligned.addFirst((byte)4);
 		}
 		for (int i=end.getColumn(); i>0; i--) {
-			fList.add((byte)4);
-			gList.add(g.byteAt(i-1));
+			fAligned.addFirst((byte)4);
+			gAligned.addFirst(g.byteAt(i-1));
 		}
-		
-		fAligned = fList.getReverse();
-		gAligned = gList.getReverse();
 		
 		return end;
 	}
