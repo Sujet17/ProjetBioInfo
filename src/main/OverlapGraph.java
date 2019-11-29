@@ -195,5 +195,60 @@ public class OverlapGraph {
 		if ((isSource && arc.isComplSource()) || (!isSource && arc.isComplDest()))
 			return 2;
 		return 1;
-	}		
+	}	
+	
+	
+	public int maxForTab(Byte[] tab) {
+		int index=0;
+		int max = tab[0];
+		for (int k=1; k<tab.length;k++) {
+			if(tab[k]>max) {
+				index = k;
+			}
+		}
+		return index;
+		
+	}
+	public Fragment ConsensusVote(Fragment[] fragTab) {
+		Byte[] cntTab = new Byte[4];
+		cntTab[0]=0;
+		cntTab[1]=0;
+		cntTab[2]=0;
+		cntTab[3]=0;
+		Fragment fragWin = fragTab[0];
+		for(int j=0; j<fragTab[0].size();j++) {
+			for(int i=0; i<fragTab.length;i++) {
+				switch (fragTab[i].charAt(j)){
+				case 'a': cntTab[0]++;
+					break;
+				case 'c': cntTab[1]++;
+					break;
+				case 'g': cntTab[2]++;
+					break;
+				case 't': cntTab[3]++;
+					break;
+				default : break;
+				}
+				
+			}
+			int index = maxForTab(cntTab);
+			switch (index) {
+			case 0: fragWin.replace(j, 'a');
+				break;
+			case 1: fragWin.replace(j, 'c');
+				break;
+			case 2: fragWin.replace(j, 'g');
+				break;
+			case 3: fragWin.replace(j, 't');
+				break;
+			default : break;
+			}
+			cntTab[0]=0;
+			cntTab[1]=0;
+			cntTab[2]=0;
+			cntTab[3]=0;
+		}
+		
+		return fragWin;
+	}
 }

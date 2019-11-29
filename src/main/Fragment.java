@@ -94,6 +94,9 @@ public class Fragment {
 			throw new IllegalArgumentException();
 	}
 	
+	public void replace(int index ,char c) {
+		list[index]=Fragment.byteFromChar(c);
+	}
 	public int size() {
 		return length;
 	}
