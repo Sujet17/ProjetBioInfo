@@ -24,8 +24,8 @@ public class SemiGlobalAlignment {
 	 */
 	private short[][] alignmentMatrix;
 	
-	FragmentBuilder fAligned;
-	FragmentBuilder gAligned;
+	public FragmentBuilder fAligned;
+	public FragmentBuilder gAligned;
 	
 	public SemiGlobalAlignment(Fragment f, Fragment g) {
 		n = f.size()+1;
@@ -220,16 +220,16 @@ public class SemiGlobalAlignment {
 	
 	private void manageNextCase(MatrixMove nextCase, FragmentBuilder fBuilder, FragmentBuilder gBuilder) {
 		if (nextCase.getMove() == MatrixMove.MoveType.LEFT) {
-			fBuilder.add((byte)4);
-			gBuilder.add(g.byteAt(nextCase.getColumn()-1));
+			fBuilder.addFirst((byte)4);
+			gBuilder.addFirst(g.byteAt(nextCase.getColumn()-1));
 		}
 		else if (nextCase.getMove() == MatrixMove.MoveType.UP) {
-			fBuilder.add(f.byteAt(nextCase.getLine()-1));
-			gBuilder.add((byte)4);
+			fBuilder.addFirst(f.byteAt(nextCase.getLine()-1));
+			gBuilder.addFirst((byte)4);
 		}
 		else {  // if (nextCase.getMove() == MatrixMove.MoveType.DIAG or nextCase.getMove() == null) 
-			fBuilder.add(f.byteAt(nextCase.getLine()-1));
-			gBuilder.add(g.byteAt(nextCase.getColumn()-1));
+			fBuilder.addFirst(f.byteAt(nextCase.getLine()-1));
+			gBuilder.addFirst(g.byteAt(nextCase.getColumn()-1));
 		}
 	}
 	

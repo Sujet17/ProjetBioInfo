@@ -9,10 +9,6 @@ public class FragmentBuilder extends LinkedList<Byte> {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public FragmentBuilder() {
-		super();
-	}
-	
 	@Override
 	public String toString() {
 		return new Fragment(this).toString();

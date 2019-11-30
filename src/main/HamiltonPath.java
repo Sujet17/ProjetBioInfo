@@ -1,25 +1,26 @@
 package main;
 
-import java.util.Comparator;
-import java.util.TreeSet;
+import java.util.HashMap;
 
-public class HamiltonPath extends TreeSet<Arc>{
+public class HamiltonPath extends HashMap<Integer, Arc> {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public HamiltonPath() {
-		super(new Comparator<Arc>() {
-			public int compare(Arc o1, Arc o2) {
-				return o1.getSource() - o2.getSource();
-			}
-		});
+	private int start;
+
+	public Arc getStart() {
+		return get(start);
+	}
+
+	public void setStartNode(int startIndex) {
+		start = startIndex;
 	}
 	
-	public Arc getArc(int arcSource) {
-		return ceiling(new Arc(arcSource, 0, false, false, 0));
+	public void add(Arc arc) {
+		put(arc.getSource(), arc);
 	}
 	
 }

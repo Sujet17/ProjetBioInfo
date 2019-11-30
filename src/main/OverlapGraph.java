@@ -137,6 +137,14 @@ public class OverlapGraph {
 				break;
 			arc = arcs.poll();
 		} 
+		
+		for (Integer i : path.keySet()) {
+			if (in[i] == 0) {
+				path.setStartNode(i);
+				break;
+			}
+		}
+		
 		return path;
 	}
 	
