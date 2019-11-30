@@ -16,12 +16,11 @@ Todo list
 - [ ] Vote de consensus
 - [ ] Rapport
 - [ ] Multithreading pour construction des arcs : java-copy-on-write-arraylist
-- [ ] Trouver un meilleur nom pour getVal() dans la classe overlapGraph
-- [ ] Trouver structure de données adéquate pour FragmentBuilder
+- [ ] Trouver structure de données adéquate pour FragmentBuilder -> Ameliorer new Fragment(FragmentBuilder b) en consequence
 - [ ] Javadoc
 - [ ] Gradle
 
-- [ ] Liste de questions pour Clement
+- [x] Liste de questions pour Clement
 
 - Propagation des gaps 
 - Vote de consensus

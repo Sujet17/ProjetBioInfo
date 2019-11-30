@@ -2,25 +2,21 @@ package main;
 
 public class Fragment {
 	
-	private int length;
 	private byte[] list;
 	
 	public Fragment(String s) {
-		length = s.length();
-		list  = new byte[length];
-		for (int i=0; i<length; i++)
+		list  = new byte[s.length()];
+		for (int i=0; i<list.length; i++)
 			list[i] = Fragment.byteFromChar(s.charAt(i));
 	}
 	
-	public Fragment(byte[] list, int length) {
-		this.length = length;
+	public Fragment(byte[] list) {
 		this.list = list;
 	}
 	
 	public Fragment(FragmentBuilder builder) {
-		length = builder.size();
-		list  = new byte[length];
-		for (int i=0; i<length; i++)
+		list  = new byte[builder.size()];
+		for (int i=0; i<list.length; i++)
 			list[i] = builder.get(i);
 	}
 	
@@ -75,11 +71,12 @@ public class Fragment {
 	 * @return the complementary of a the fragment
 	 */
 	public Fragment getComplementary() {
+		int length = list.length;
 		byte[] compl = new byte[length];
 		for (int i=0; i<length; i++) {
 			compl[length-i-1] = Fragment.complementaryByte(list[i]);
 		}
-		return new Fragment(compl, length);
+		return new Fragment(compl);
 	}
 	
 	/**
@@ -94,11 +91,13 @@ public class Fragment {
 			throw new IllegalArgumentException();
 	}
 	
-	public void replace(int index ,char c) {
-		list[index]=Fragment.byteFromChar(c);
+
+	public void set(int index, byte b) {
+		list[index] = b;
 	}
+	
 	public int size() {
-		return length;
+		return list.length;
 	}
 	
 	public byte byteAt(int index) {
@@ -110,9 +109,20 @@ public class Fragment {
 	}
 	
 	@Override
+	public boolean equals(Object o) {
+		if (o == this)
+			return true;
+		if (o instanceof Fragment) {
+			Fragment other = (Fragment) o;
+			return toString().equals(other.toString());
+		}
+		return false;
+	}
+	
+	@Override
 	public String toString() { 
 		StringBuilder builder = new StringBuilder();
-		for (int i=0; i<length; i++)
+		for (int i=0; i<list.length; i++)
 			builder.append(charAt(i));
 		return builder.toString();
 	}
