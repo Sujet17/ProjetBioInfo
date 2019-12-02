@@ -208,29 +208,39 @@ public class SemiGlobalAlignment {
 	 */
 	private MatrixMove buildAlignment(MatrixMove startCase, boolean saveAlignment, FragmentBuilder fList, FragmentBuilder gList) {
 		MatrixMove nextCase = new MatrixMove(startCase.getLine(), startCase.getColumn());
+		int x = 0, y = 0;
 		
 		while (nextCase.getLine()>=1 && nextCase.getColumn()>=1) {
-			if (saveAlignment)
-				manageNextCase(nextCase, fList, gList);
+			if (saveAlignment) {
+				x = nextCase.getLine();
+				y = nextCase.getColumn();
+			}
 			nextCase = getNextCase(nextCase.getLine(), nextCase.getColumn());
+			if (saveAlignment) {
+				manageNextCase(x, y, nextCase.getMove(), fList, gList);
+			}
 		}
 		
 		return nextCase;
 	}
 	
-	private void manageNextCase(MatrixMove nextCase, FragmentBuilder fBuilder, FragmentBuilder gBuilder) {
-		if (nextCase.getMove() == MatrixMove.MoveType.LEFT) {
+	private void manageNextCase(int line, int column, MatrixMove.MoveType oldMove, FragmentBuilder fBuilder, FragmentBuilder gBuilder) {
+
+		if (oldMove == MatrixMove.MoveType.LEFT) {
 			fBuilder.addFirst((byte)4);
-			gBuilder.addFirst(g.byteAt(nextCase.getColumn()-1));
+			gBuilder.addFirst(g.byteAt(column-1));
 		}
-		else if (nextCase.getMove() == MatrixMove.MoveType.UP) {
-			fBuilder.addFirst(f.byteAt(nextCase.getLine()-1));
+		else if (oldMove == MatrixMove.MoveType.UP) {
+			fBuilder.addFirst(f.byteAt(line-1));
 			gBuilder.addFirst((byte)4);
 		}
-		else {  // if (nextCase.getMove() == MatrixMove.MoveType.DIAG or nextCase.getMove() == null) 
-			fBuilder.addFirst(f.byteAt(nextCase.getLine()-1));
-			gBuilder.addFirst(g.byteAt(nextCase.getColumn()-1));
+		else if (oldMove == MatrixMove.MoveType.DIAG) {  
+			fBuilder.addFirst(f.byteAt(line-1));
+			gBuilder.addFirst(g.byteAt(column-1));
 		}
+		//else
+		//	throw new IllegalArgumentException("MoveType ne peut pas être null");
+		 
 	}
 	
 	/**

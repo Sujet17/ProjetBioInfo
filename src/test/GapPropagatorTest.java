@@ -4,14 +4,16 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import main.Arc;
-import main.Fragment;
 import main.FragmentList;
-import main.GapPropagator;
 import main.HamiltonPath;
 import main.OverlapGraph;
-import main.SemiGlobalAlignment;
 
+/*
+import main.Fragment;
+import main.GapPropagator;
+import main.Arc;
+import main.SemiGlobalAlignment;
+*/
 public class GapPropagatorTest {
 
 	@Test
@@ -21,17 +23,17 @@ public class GapPropagatorTest {
 		
 		OverlapGraph graph = new OverlapGraph(fl);
 		
-		GapPropagator gp = new GapPropagator(fl);
 		
 		HamiltonPath path = graph.getHamiltonPath();
 		
-		Fragment[] tab = gp.propagateGaps(path);
-		
-		System.out.println(path);
-		
 		assertEquals(path.getStart().getSource(), 3);
 		
-		for (int i=0; i<4; i++) {
+		/*
+		 * 
+		GapPropagator gp = new GapPropagator(fl);
+		Fragment[] tab = gp.propagateGaps(path);
+		
+		for (int i : path.keySet()) {
 			Arc arc = path.get(i);
 			Fragment f = fl.get(arc.getSource());
 			if (arc.isComplSource())
@@ -40,15 +42,14 @@ public class GapPropagatorTest {
 			if (arc.isComplDest())
 				g = g.getComplementary();
 			SemiGlobalAlignment sga = new SemiGlobalAlignment(f, g);
-			System.out.println(i+"   :    "+sga.getScoreFG(true));
+			System.out.println(i+" : "+arc.getDestination()+" ; "+sga.getScoreFG(true)+ " ; f :"+f+" ; g :"+g);
 			System.out.println(sga.fAligned);
 			System.out.println(sga.gAligned);
 		}
 		
 		for (int i=0; i<tab.length; i++) 
 			System.out.println("ici - "+tab[i]);
-		
-		//assertEquals(tab[0], new Fragment("tccgaagtctgct-------"));
+		*/
 	}
 
 }

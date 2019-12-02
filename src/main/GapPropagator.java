@@ -45,7 +45,7 @@ public class GapPropagator {
 		for (int i=1; i<path.size(); i++) {
 			result.add(g1);
 			arc = path.get(arc.getDestination());
-
+			
 			couple = getFragmentsFromArc(arc);
 			
 			g2 = couple.f;
@@ -107,9 +107,27 @@ public class GapPropagator {
 		if (arc.isComplDest())
 			g = g.getComplementary();
 		SemiGlobalAlignment sga = new SemiGlobalAlignment(f, g);
-		sga.getScoreFG(true);
+		int score = sga.getScoreFG(true);
+		if (score == 0)
+			return juxtaposeFragments(f, g);
 		CoupleFragments cf = new CoupleFragments(sga.fAligned, sga.gAligned);
 		return cf;
+	}
+	
+	private CoupleFragments juxtaposeFragments(Fragment f, Fragment g) {
+		FragmentBuilder fNew = new FragmentBuilder();
+		FragmentBuilder gNew = new FragmentBuilder();
+		
+		for (int i=0; i<f.size(); i++) {
+			fNew.add(f.byteAt(i));
+			gNew.add((byte)4);
+		}
+		for (int i=0; i<g.size(); i++) {
+			fNew.add((byte)4);
+			gNew.add(g.byteAt(i));
+		
+		}
+		return new CoupleFragments(fNew, gNew);
 	}
 	
 }

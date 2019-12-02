@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import main.Fragment;
+import main.FragmentList;
 import main.SemiGlobalAlignment;
 
 public class SemiGlobalAlignmentTest {
@@ -55,6 +56,20 @@ public class SemiGlobalAlignmentTest {
 		}
 		
 	}
+	
+	
+	@Test
+	public void test() {
+		
+		FragmentList fl = FragmentList.getFragmentsFromFile("Collections/test/collectionTest.fasta");
+
+		SemiGlobalAlignment sga = new SemiGlobalAlignment(fl.get(1), fl.get(4));
+		assertEquals(4,sga.getScoreFG(true));
+		assertEquals(new Fragment(sga.fAligned), new Fragment("aggtcaactgatc-----") );
+		assertEquals(new Fragment(sga.gAligned), new Fragment("----caactg-ccaaaaa") );
+		
+	}
+	
 	
 	@Test
 	public void testMatchValue() {
