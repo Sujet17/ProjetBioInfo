@@ -1,8 +1,10 @@
 package main;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -12,16 +14,11 @@ public class FragmentList extends ArrayList<Fragment> {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	public FragmentList() {
-		super();
-	}
 	
 	/**
-	 * read file and convert data into fragment
-	 * 
-	 * @param filename, file to read
-	 * @return the fragments from the filename
+	 * read the given file and convert data into fragment 
+	 * @param filename, the filepath to file to read
+	 * @return the arrayList of the fragments readed in the file
 	 */
 	public static FragmentList getFragmentsFromFile(String filename) {
 		FragmentList fragments = new FragmentList();
@@ -50,6 +47,27 @@ public class FragmentList extends ArrayList<Fragment> {
 			e.printStackTrace();
 		}
 		return fragments;
+	}
+	
+	public static void writeToFile(Fragment f, String collectionNum, String filename) {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+			writer.write("> Groupe-4 Collection "+collectionNum);
+			writer.write(" Longueur "+Integer.toString(f.size()));
+			writer.newLine();
+			int i = 0;
+			String result = f.toString();
+			while ((i+1)*81<f.size()) {
+				writer.write(result.substring(i*81, (i+1)*81));
+				writer.newLine();
+				i++;
+			}
+			writer.write(result.substring(i*81, f.size()));
+			writer.close();
+		} catch (IOException e) {
+			System.out.println("Erreur dans le fichier");
+			e.printStackTrace();
+		}
 	}
 	
 	@Override

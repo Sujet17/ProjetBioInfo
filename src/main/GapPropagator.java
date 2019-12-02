@@ -2,6 +2,11 @@ package main;
 
 import java.util.LinkedList;
 
+/**
+ * 
+ * This class manage the gap propagation step 
+ *
+ */
 public class GapPropagator {
 	
 	private class CoupleFragments {
@@ -13,29 +18,30 @@ public class GapPropagator {
 			this.f = f;
 			this.g = g;
 		}
-		
 	}
 	
 	private FragmentList fragments;
 	
 	private LinkedList<FragmentBuilder> result;
 	
-	/*
-	private FragmentBuilder fAligned;
-	private FragmentBuilder gAligned;
-	*/
-	
+	/**
+	 * 
+	 * @param fl The fragmentList of the fragments
+	 */
 	public GapPropagator(FragmentList fl) {
 		fragments = fl;
 		result = new LinkedList<FragmentBuilder>();
 	}
 	
+	/**
+	 * 
+	 * @param path the hamilton path on the fragmentList given in the constructor
+	 * @return An array of fragments which contains all the aligned fragments from the hamilton path
+	 */
 	public Fragment[] propagateGaps(HamiltonPath path) {
 		Arc arc = path.getStart();
 		
 		CoupleFragments couple = getFragmentsFromArc(arc);
-		
-		// !!!! Ne pas oublier de gerer la propagation correctement quand h est le tout premier fragment choisi
 		
 		FragmentBuilder g1, g2, h=null;
 		
@@ -98,8 +104,12 @@ public class GapPropagator {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param arc An arc
+	 * @return The two aligned fragments indicated by the arc in the FragmentList fragments attribute
+	 */
 	private CoupleFragments getFragmentsFromArc(Arc arc) {
-
 		Fragment f = fragments.get(arc.getSource());
 		Fragment g = fragments.get(arc.getDestination());
 		if (arc.isComplSource())
@@ -114,6 +124,12 @@ public class GapPropagator {
 		return cf;
 	}
 	
+	/**
+	 * Used when the arc f->g has an weight of 0. Put |f| gaps before g and |g| gaps after f to align them
+	 * @param f The first fragment
+	 * @param g The second fragment
+	 * @return The alignedFraments in a coupleFragments object
+	 */
 	private CoupleFragments juxtaposeFragments(Fragment f, Fragment g) {
 		FragmentBuilder fNew = new FragmentBuilder();
 		FragmentBuilder gNew = new FragmentBuilder();

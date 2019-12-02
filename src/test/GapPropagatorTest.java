@@ -29,7 +29,6 @@ public class GapPropagatorTest {
 		assertEquals(path.getStart().getSource(), 3);
 		
 		/*
-		 * 
 		GapPropagator gp = new GapPropagator(fl);
 		Fragment[] tab = gp.propagateGaps(path);
 		

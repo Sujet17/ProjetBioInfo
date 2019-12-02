@@ -1,41 +1,37 @@
-package main;;
+package main;
+
+import static java.lang.System.nanoTime;
 
 public class Projet {
 	
     public static void main(String args[])
     {
-    	
-		//FragmentList fl = FragmentList.getFragmentsFromFile("Collections/test/collectionTest.fasta");
-    	
+    	long startTime = nanoTime();
 
-    	/*Fragment f = fl.get(1);
-    	Fragment g = fl.get(3).getComplementary();
-		SemiGlobalAlignment sga1 = new SemiGlobalAlignment(f, g);
-		System.out.println(sga1);
+    	FragmentList fl = FragmentList.getFragmentsFromFile("Collections/10000/collection1.fasta");
+		OverlapGraph graph = new OverlapGraph(fl);    	
+
+		long currentTime = nanoTime();
+		long timeElapsed = currentTime - startTime;
+		System.out.println("Milliseconds time to build graph : " + timeElapsed/1000000);
+		
+		HamiltonPath path = graph.getHamiltonPath();
+				
+		long time = nanoTime();
+		timeElapsed = time - currentTime;
+		System.out.println("Milliseconds time to find hamilton path : " + timeElapsed/1000000);
+		
+		GapPropagator gp = new GapPropagator(fl);
+		Fragment f = ConsensusVote.consensusVote(gp.propagateGaps(path));
 		
 		System.out.println(f);
-		System.out.println(g);
+		timeElapsed = nanoTime() - startTime;
+		System.out.println("Total time in milliseconds : " + timeElapsed/1000000);
 		
-		System.out.println(sga1.getScoreFG(true));
+		FragmentList.writeToFile(f, Integer.toString(10000), "Collections/10000/result1.fasta");
 		
-		System.out.println(new Fragment(sga1.fAligned));
-		System.out.println(new Fragment(sga1.gAligned));
 		
-
-		System.out.println(sga1.getScoreGF(true));
-
-		System.out.println(new Fragment(sga1.fAligned));
-		System.out.println(new Fragment(sga1.gAligned));
-		
-		System.out.println("----------");
-		//System.out.println(sga1);
-		*/
-    	
-    	FragmentList fl = FragmentList.getFragmentsFromFile("Collections/10000/collection1.fasta");
-    	
-		OverlapGraph graph = new OverlapGraph(fl);    	
-    	
-		System.out.println(graph.getHamiltonPath());
+		System.out.println();
     }
 	
 }

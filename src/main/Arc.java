@@ -22,6 +22,9 @@ public class Arc implements Comparable<Arc> {
 	 */
 	private boolean complDest;
 	
+	/**
+	 * The weight of the arc
+	 */
 	private int weight;
 	
 	/**
@@ -59,7 +62,10 @@ public class Arc implements Comparable<Arc> {
 	public int getWeight() {
 		return weight;
 	}
-
+	
+	/**
+	 * Used to class the arcs by decreasing weight
+	 */
 	public int compareTo(Arc other) {
 		return other.weight - weight;
 	}
