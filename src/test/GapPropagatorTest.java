@@ -12,8 +12,10 @@ import main.OverlapGraph;
 import main.Fragment;
 import main.GapPropagator;
 import main.Arc;
+import main.CoupleFragments;
 import main.SemiGlobalAlignment;
 */
+
 public class GapPropagatorTest {
 
 	@Test
@@ -41,9 +43,10 @@ public class GapPropagatorTest {
 			if (arc.isComplDest())
 				g = g.getComplementary();
 			SemiGlobalAlignment sga = new SemiGlobalAlignment(f, g);
-			System.out.println(i+" : "+arc.getDestination()+" ; "+sga.getScoreFG(true)+ " ; f :"+f+" ; g :"+g);
-			System.out.println(sga.fAligned);
-			System.out.println(sga.gAligned);
+			System.out.println(i+" : "+arc.getDestination()+" ; "+sga.getScoreFG()+ " ; f :"+f+" ; g :"+g);
+			CoupleFragments cf = sga.retrieveWordsAligned();
+			System.out.println(cf.f);
+			System.out.println(cf.g);
 		}
 		
 		for (int i=0; i<tab.length; i++) 

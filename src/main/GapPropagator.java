@@ -9,17 +9,6 @@ import java.util.LinkedList;
  */
 public class GapPropagator {
 	
-	private class CoupleFragments {
-		
-		private FragmentBuilder f;
-		private FragmentBuilder g;
-		
-		private CoupleFragments(FragmentBuilder f, FragmentBuilder g) {
-			this.f = f;
-			this.g = g;
-		}
-	}
-	
 	private FragmentList fragments;
 	
 	private LinkedList<FragmentBuilder> result;
@@ -117,10 +106,10 @@ public class GapPropagator {
 		if (arc.isComplDest())
 			g = g.getComplementary();
 		SemiGlobalAlignment sga = new SemiGlobalAlignment(f, g);
-		int score = sga.getScoreFG(true);
+		int score = sga.getScoreFG();
 		if (score == 0)
 			return juxtaposeFragments(f, g);
-		CoupleFragments cf = new CoupleFragments(sga.fAligned, sga.gAligned);
+		CoupleFragments cf = sga.retrieveWordsAligned();
 		return cf;
 	}
 	

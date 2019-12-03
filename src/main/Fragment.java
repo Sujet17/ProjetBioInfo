@@ -18,7 +18,7 @@ public class Fragment {
 	
 	public Fragment(FragmentBuilder builder) {
 		list  = new byte[builder.size()];
-		ListIterator iterator = builder.listIterator();
+		ListIterator<Byte> iterator = builder.listIterator();
 		for (int i=0; i<list.length; i++)
 			list[i] = (byte)iterator.next();
 	}

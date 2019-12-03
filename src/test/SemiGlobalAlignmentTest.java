@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import main.CoupleFragments;
 import main.Fragment;
 import main.FragmentList;
 import main.SemiGlobalAlignment;
@@ -64,9 +65,10 @@ public class SemiGlobalAlignmentTest {
 		FragmentList fl = FragmentList.getFragmentsFromFile("Collections/test/collectionTest.fasta");
 
 		SemiGlobalAlignment sga = new SemiGlobalAlignment(fl.get(1), fl.get(4));
-		assertEquals(4,sga.getScoreFG(true));
-		assertEquals(new Fragment(sga.fAligned), new Fragment("aggtcaactgatc-----") );
-		assertEquals(new Fragment(sga.gAligned), new Fragment("----caactg-ccaaaaa") );
+		assertEquals(4,sga.getScoreFG());
+		CoupleFragments cf = sga.retrieveWordsAligned();
+		assertEquals(new Fragment(cf.f), new Fragment("aggtcaactgatc-----") );
+		assertEquals(new Fragment(cf.g), new Fragment("----caactg-ccaaaaa") );
 		
 	}
 	
@@ -102,14 +104,14 @@ public class SemiGlobalAlignmentTest {
 	
 	@Test
 	public void testAlignementFG() {
-		assertEquals(sga1Test.getScoreFG(false), 0);
-		assertEquals(sga2Test.getScoreFG(false), -1);
+		assertEquals(sga1Test.getScoreFG(), 0);
+		assertEquals(sga2Test.getScoreFG(), -1);
 	}
 	
 	@Test
 	public void testAlignementGF() {
-		assertEquals(sga1Test.getScoreGF(false), 2);
-		assertEquals(sga2Test.getScoreGF(false), -1);
+		assertEquals(sga1Test.getScoreGF(), 2);
+		assertEquals(sga2Test.getScoreGF(), -1);
 	}
 
 }

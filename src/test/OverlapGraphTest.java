@@ -51,7 +51,7 @@ public class OverlapGraphTest {
 		SemiGlobalAlignment sga1 = new SemiGlobalAlignment(f, g);
 		SemiGlobalAlignment sga2 = new SemiGlobalAlignment(gPrime, fPrime);
 		
-		assertEquals(sga1.getScoreFG(false), sga2.getScoreFG(false));
+		assertEquals(sga1.getScoreFG(), sga2.getScoreFG());
 	}
 	
 	

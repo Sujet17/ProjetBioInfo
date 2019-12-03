@@ -24,9 +24,6 @@ public class SemiGlobalAlignment {
 	 */
 	private short[][] alignmentMatrix;
 	
-	public FragmentBuilder fAligned;
-	public FragmentBuilder gAligned;
-	
 	public SemiGlobalAlignment(Fragment f, Fragment g) {
 		n = f.size()+1;
 		m = g.size()+1;
@@ -58,8 +55,8 @@ public class SemiGlobalAlignment {
 	
 	/**
 	 * Check match or mismatch
-	 * @param x , index of the first value to compare
-	 * @param y , index of the second value to compare
+	 * @param x index of the first value to compare
+	 * @param y index of the second value to compare
 	 * @return true if values match, false if not
 	 */
 	public short matchValue(int x, int y) {
@@ -122,51 +119,40 @@ public class SemiGlobalAlignment {
 	 * 
 	 * @return -1 if F is in G, 0 if no edge from F to G or score of global alignment if there is an edge from F to G
 	 */
-	public int getScoreFG(boolean saveFoundAlignment) {
+	public int getScoreFG() {
 		int iMax = getMaxLastLine();
-		// Pas d'arc f -> g
-		if (iMax == 0) 
+
+		if (iMax == 0) 	// f -> g de poids 0
 			return 0;
 		else {
 			MatrixMove startCase = new MatrixMove(n-1, iMax);
-			MatrixMove endCase;
-			if (saveFoundAlignment) 
-				endCase = retrieveWordsAligned(startCase);					
-			else
-				endCase = buildAlignment(startCase, false, null, null);
-			// f -> g avec comme poids le score de l'alignement semi-global
-			if (endCase.getLine() > 0)
+			MatrixMove endCase = buildAlignment(startCase, false, null, null);
+			
+			if (endCase.getLine() > 0) // f -> g avec comme poids le score de l'alignement semi-global
 				return alignmentMatrix[startCase.getLine()][startCase.getColumn()];
-			// f inclus a g
-			else 
+			else 	// f inclus a g
 				return -1;
 		}
 	}
 	
 	/**
 	 * 
-	 * @return -1 if G is in F, 0 if no edge from G to F or score of global alignment if there is an edge from G to F
+	 * @return -1 if G is in F, the score of global alignment from f to g else
 	 */
-	public int getScoreGF(boolean saveFoundAlignment) {
+	public int getScoreGF() {
 		int iMax = getMaxLastColumn();
-		//Pas d'arc g -> f
+		// g -> f de poids 0
 		if (iMax == 0) 
 			return 0;
 		else {
 			MatrixMove startCase = new MatrixMove(iMax, m-1);
-			MatrixMove endCase;
-			if (saveFoundAlignment) 
-				endCase = retrieveWordsAligned(startCase);
-			else
-				endCase = buildAlignment(startCase, false, null, null);
-			// g -> f
-			if (endCase.getColumn() > 0)
+			MatrixMove endCase = buildAlignment(startCase, false, null, null);
+
+			if (endCase.getColumn() > 0) // g -> f
 				return alignmentMatrix[startCase.getLine()][startCase.getColumn()];
-			// g inclus a f
-			else 
+			else // g inclus a f
 				return -1;
 		}
-	
 	}
 	
 	/**
@@ -174,10 +160,12 @@ public class SemiGlobalAlignment {
 	 * @param start
 	 * @return
 	 */
-	private MatrixMove retrieveWordsAligned(MatrixMove start) {
+	public CoupleFragments retrieveWordsAligned() {
 
-		fAligned = new FragmentBuilder();
-		gAligned = new FragmentBuilder();		
+		FragmentBuilder fAligned = new FragmentBuilder();
+		FragmentBuilder gAligned = new FragmentBuilder();		
+		
+		MatrixMove start = new MatrixMove(n-1, getMaxLastLine());
 		
 		for (int i=0; i<n-1-start.getLine(); i++) {
 			fAligned.addFirst(f.byteAt(n-2-i));
@@ -199,7 +187,7 @@ public class SemiGlobalAlignment {
 			gAligned.addFirst(g.byteAt(i-1));
 		}
 		
-		return end;
+		return new CoupleFragments(fAligned, gAligned);
 	}
 	
 	/**

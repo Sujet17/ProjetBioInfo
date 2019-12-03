@@ -4,11 +4,26 @@ import java.util.PriorityQueue;
 
 
 public class OverlapGraph {
-
+	
+	
+	/**
+	 * The list of the fragments
+	 */
 	private FragmentList fragments;	
+	
+	/**
+	 * An heap to store all the arcs of the graph
+	 */
 	private PriorityQueue<Arc> arcs;
 	
+	/**
+	 * An array to manage the inclusions between fragments.
+	 * Let included[i] == x, 
+	 * If x == -1, that means that the ith fragment is not included to another fragment in the list;
+	 * Else, that means that the ith fragment is included in the xth.
+	 */
 	private int[] included;
+	
 	
 	public OverlapGraph(FragmentList fragments) {
 		this.fragments = fragments;
@@ -37,10 +52,10 @@ public class OverlapGraph {
 	}
 	
 	/**
-	 * Build the 8 arcs (f->g, f'->g, g->f, g->f', ...) 
-	 * @param f1
-	 * @param f2
-	 * @return
+	 * Build the 8 arcs (f->g, f'->g, g->f, g->f', ...) between the nodes f and g.
+	 * The inclusions between fragments are detected and managed here.
+	 * @param indexF the index of the node f
+	 * @param indexG the index of the node g
 	 */
 	private void buildArcs(int indexF, int indexG) {
 		
@@ -51,13 +66,13 @@ public class OverlapGraph {
 		Fragment g = fragments.get(indexG);
 		
 		SemiGlobalAlignment sga = new SemiGlobalAlignment(f, g);
-		SemiGlobalAlignment sga2 = new SemiGlobalAlignment(f, g.getComplementary());
+		SemiGlobalAlignment sga1 = new SemiGlobalAlignment(f, g.getComplementary());
 		
-		int weight1 = sga.getScoreFG(false);
-		int weight2 = sga.getScoreGF(false);
+		int weight1 = sga.getScoreFG();
+		int weight2 = sga.getScoreGF();
 
-		int weight3 = sga2.getScoreFG(false);
-		int weight4 = sga2.getScoreGF(false);
+		int weight3 = sga1.getScoreFG();
+		int weight4 = sga1.getScoreGF();
 		
 		if (weight1 == -1 || weight2 == -1 || weight3 == -1 || weight4 == -1) {
 			if (f.size() < g.size())
@@ -83,9 +98,9 @@ public class OverlapGraph {
 	
 	
 	/**
-	 * Build the specified arc if he exists
-	 * @param weight
-	 * @param indexSource
+	 * Instantiate an arc and add it to the "arcs" attribute 
+	 * @param weight 
+	 * @param indexSource 
 	 * @param indexDest
 	 * @param complSource
 	 * @param complDest
@@ -94,19 +109,11 @@ public class OverlapGraph {
 		if (weight >= 0)
 			arcs.add(new Arc(indexSource, indexDest, complSource, complDest, weight));
 		else
-			throw new IllegalArgumentException("Le poids d'un arc doit etre superieur a -1");
+			throw new IllegalArgumentException("Le poids d'un arc doit etre superieur (non strictement) a 0");
 	}
-	
-	/*
-	 * Used for testing
-	 */
-	public PriorityQueue<Arc> getArcs() {
-		return arcs;
-	}
-	
 
 	/**
-	 * 
+	 * Find the hamilton path on this graph. Note that this method modifies the "arcs" attribute and thus cannot be called twice on the same object.
 	 * @return the Hamilton Path
 	 */
 	public HamiltonPath getHamiltonPath() {
@@ -156,6 +163,10 @@ public class OverlapGraph {
 			System.out.print(included[i]+" ");
 	}
 	
+	/**
+	 * Used to ignore the included fragments 
+	 * @param struct
+	 */
 	public void manageIncludedFragments(UnionFind struct) {
 		int cnt = 0;
 		for (int i=0; i<fragments.size(); i++) {
@@ -170,12 +181,12 @@ public class OverlapGraph {
 	}
 	
 	/**
-	 * 
-	 * @param struct
-	 * @param arc
-	 * @param in
+	 * Check if the given arc can be added to the hamilton path. 
+	 * @param struct the UnionFind structure that is used to check if the adding of the arc to the hamilton path will create a cycle
+	 * @param arc 
+	 * @param in 
 	 * @param out
-	 * @return true if ..., false else
+	 * @return true if the given arc can be added to the hamilton path, false else
 	 */
 	public boolean isAvailableArc(UnionFind struct, Arc arc, int[] in, int[] out) {
 		int f = arc.getSource();

@@ -12,7 +12,7 @@ Todo list
 - [x] Tester chemin hamiltonien de l'overlapGraph
 - [x] Changer int an short dans les matrices de SGA
 - [x] Refaire testHamiltonPath classe overlapGraphTest
-- [ ] Retirer fAligned et gAligned de SemiGlobalAlignment
+- [x] Retirer fAligned et gAligned de SemiGlobalAlignment
 - [x] Gerer les gaps
 - [ ] Test propagation gaps -> Ecrire test complet + test cas propagation gap vers le haut
 - [x] Vote de consensus
@@ -21,6 +21,7 @@ Todo list
 - [ ] Trouver structure de données adéquate pour FragmentBuilder -> Ameliorer new Fragment(FragmentBuilder b) en consequence
 - [ ] Javadoc
 - [ ] Gradle
+- [ ] A la fin, ne pas oublier de retirer les print dans le manageIncludedFragments de la classe OverlapGraph
 
 - [x] Liste de questions pour Clement
 
