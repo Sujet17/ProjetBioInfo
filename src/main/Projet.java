@@ -4,11 +4,15 @@ import static java.lang.System.nanoTime;
 
 public class Projet {
 	
+	public static final String targetSize = "10000";
+	public static final String collectionNumber = "1";
+	
     public static void main(String args[])
-    {
+    {	
+    	
     	long startTime = nanoTime();
 
-    	FragmentList fl = FragmentList.getFragmentsFromFile("Collections/10000/collection1.fasta");
+    	FragmentList fl = FragmentList.getFragmentsFromFile("Collections/"+targetSize+"/collection"+collectionNumber+".fasta");
 		OverlapGraph graph = new OverlapGraph(fl);    	
 
 		long currentTime = nanoTime();
@@ -24,14 +28,14 @@ public class Projet {
 		GapPropagator gp = new GapPropagator(fl);
 		Fragment f = ConsensusVote.consensusVote(gp.propagateGaps(path));
 		
-		System.out.println(f);
 		timeElapsed = nanoTime() - startTime;
 		System.out.println("Total time in milliseconds : " + timeElapsed/1000000);
 		
-		FragmentList.writeToFile(f, Integer.toString(10000), "Collections/10000/result1.fasta");
+		FragmentList.writeToFile(f, Integer.toString(10000), "Collections/"+targetSize+"/result"+collectionNumber+".fasta");
 		
 		
 		System.out.println();
+		
     }
 	
 }

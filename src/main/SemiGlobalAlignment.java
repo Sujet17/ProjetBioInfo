@@ -179,7 +179,7 @@ public class SemiGlobalAlignment {
 	 * Return the semi-global alignment f->g. This method doesn't work if the score of f->g is equal to zero. 
 	 * @return A pair of FragmentBuilder. The first is f and the second is g and both are aligned following the f->g alignment
 	 */
-	public CoupleFragments retrieveWordsAligned() {
+	public AlignedFragments retrieveWordsAligned() {
 
 		FragmentBuilder fAligned = new FragmentBuilder();
 		FragmentBuilder gAligned = new FragmentBuilder();		
@@ -206,7 +206,7 @@ public class SemiGlobalAlignment {
 			gAligned.addFirst(g.byteAt(i-1));
 		}
 		
-		return new CoupleFragments(fAligned, gAligned);
+		return new AlignedFragments(fAligned, gAligned);
 	}
 	
 	/**

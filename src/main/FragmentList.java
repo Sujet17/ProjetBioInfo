@@ -31,7 +31,7 @@ public class FragmentList extends ArrayList<Fragment> {
 				
 				line = reader.readLine();
 
-				while(line != null && line.charAt(0) != '>') {
+				while(line != null && (line.equals("") || line.charAt(0) != '>' )) {
 					fragment.append(line);
 					line = reader.readLine();
 				}

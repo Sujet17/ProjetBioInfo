@@ -1,14 +1,13 @@
 package main;
 
-public class CoupleFragments {
+public class AlignedFragments {
 		
 	public FragmentBuilder f;
 	public FragmentBuilder g;
 	
-	CoupleFragments(FragmentBuilder f, FragmentBuilder g) {
+	AlignedFragments(FragmentBuilder f, FragmentBuilder g) {
 		this.f = f;
 		this.g = g;
 	}
-	
 	
 }

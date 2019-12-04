@@ -17,11 +17,15 @@ Todo list
 - [ ] Test propagation gaps -> Ecrire test complet + test cas propagation gap vers le haut
 - [x] Vote de consensus
 - [ ] Rapport
-- [ ] Multithreading pour construction des arcs : java-copy-on-write-arraylist
-- [ ] Trouver structure de données adéquate pour FragmentBuilder -> Ameliorer new Fragment(FragmentBuilder b) en consequence
+- [ ] Multithreading pour construction des arcs
+- [x] Trouver structure de données adéquate pour FragmentBuilder -> Ameliorer new Fragment(FragmentBuilder b) en consequence
 - [ ] Javadoc
 - [ ] Gradle
 - [ ] A la fin, ne pas oublier de retirer les print dans le manageIncludedFragments de la classe OverlapGraph
+
+- [ ] Notes diverses
+- Il y a une ligne vide au fragment 114 du collection .fasta
+- Pour le 100 000 sans multithreading, on met : 9 minutes pour construire le graphe, moins d'une seconde pour trouver le chemin et  minutes en tout
 
 - [x] Liste de questions pour Clement
 

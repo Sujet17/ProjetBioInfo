@@ -74,9 +74,9 @@ public class Fragment {
 	public Fragment getComplementary() {
 		int length = list.length;
 		byte[] compl = new byte[length];
-		for (int i=0; i<length; i++) {
+		for (int i=0; i<length; i++) 
 			compl[length-i-1] = Fragment.complementaryByte(list[i]);
-		}
+		
 		return new Fragment(compl);
 	}
 	

@@ -30,7 +30,7 @@ public class GapPropagator {
 	public Fragment[] propagateGaps(HamiltonPath path) {
 		Arc arc = path.getStart();
 		
-		CoupleFragments couple = getFragmentsFromArc(arc);
+		AlignedFragments couple = getFragmentsFromArc(arc);
 		
 		FragmentBuilder g1, g2, h=null;
 		
@@ -72,8 +72,7 @@ public class GapPropagator {
 			
 			g1 = h;	
 		}
-		result.add(h);
-		
+		result.add(h);		
 		
 		Fragment[] tab = new Fragment[result.size()];
 		int i = 0;
@@ -98,7 +97,7 @@ public class GapPropagator {
 	 * @param arc An arc
 	 * @return The two aligned fragments indicated by the arc in the FragmentList fragments attribute
 	 */
-	private CoupleFragments getFragmentsFromArc(Arc arc) {
+	private AlignedFragments getFragmentsFromArc(Arc arc) {
 		Fragment f = fragments.get(arc.getSource());
 		Fragment g = fragments.get(arc.getDestination());
 		if (arc.isComplSource())
@@ -109,8 +108,7 @@ public class GapPropagator {
 		int score = sga.getScoreFG();
 		if (score == 0)
 			return juxtaposeFragments(f, g);
-		CoupleFragments cf = sga.retrieveWordsAligned();
-		return cf;
+		return sga.retrieveWordsAligned();
 	}
 	
 	/**
@@ -119,7 +117,7 @@ public class GapPropagator {
 	 * @param g The second fragment
 	 * @return The alignedFraments in a coupleFragments object
 	 */
-	private CoupleFragments juxtaposeFragments(Fragment f, Fragment g) {
+	private AlignedFragments juxtaposeFragments(Fragment f, Fragment g) {
 		FragmentBuilder fNew = new FragmentBuilder();
 		FragmentBuilder gNew = new FragmentBuilder();
 		
@@ -132,7 +130,7 @@ public class GapPropagator {
 			gNew.add(g.byteAt(i));
 		
 		}
-		return new CoupleFragments(fNew, gNew);
+		return new AlignedFragments(fNew, gNew);
 	}
 	
 }

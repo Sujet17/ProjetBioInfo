@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import main.CoupleFragments;
+import main.AlignedFragments;
 import main.Fragment;
 import main.FragmentList;
 import main.SemiGlobalAlignment;
@@ -66,7 +66,7 @@ public class SemiGlobalAlignmentTest {
 
 		SemiGlobalAlignment sga = new SemiGlobalAlignment(fl.get(1), fl.get(4));
 		assertEquals(4,sga.getScoreFG());
-		CoupleFragments cf = sga.retrieveWordsAligned();
+		AlignedFragments cf = sga.retrieveWordsAligned();
 		assertEquals(new Fragment(cf.f), new Fragment("aggtcaactgatc-----") );
 		assertEquals(new Fragment(cf.g), new Fragment("----caactg-ccaaaaa") );
 		

@@ -1,6 +1,7 @@
 package main;
 
-import java.util.PriorityQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+//import java.util.stream.IntStream;
 
 
 public class OverlapGraph {
@@ -14,7 +15,7 @@ public class OverlapGraph {
 	/**
 	 * An heap to store all the arcs of the graph
 	 */
-	private PriorityQueue<Arc> arcs;
+	private PriorityBlockingQueue<Arc> arcs;
 	
 	/**
 	 * An array to manage the inclusions between fragments.
@@ -33,13 +34,18 @@ public class OverlapGraph {
 		for (int i=0; i<size; i++)
 			included[i] = -1;
 		
-		arcs = new PriorityQueue<Arc>();		
+		arcs = new PriorityBlockingQueue<Arc>();		
 		
+		
+    	//IntStream.range(0, size).forEach(i -> IntStream.range(i+1,  size).parallel().forEach(j -> buildArcs(i, j)));
+			
+    	
 		for (int i=0; i<size; i++) {
 			for (int j=i+1; j<size; j++) {
 				buildArcs(i, j);
 			}
 		}
+		
 	}
 	
 	/*
@@ -169,7 +175,7 @@ public class OverlapGraph {
 	 */
 	public void manageIncludedFragments(UnionFind struct) {
 		int cnt = 0;
-		for (int i=0; i<fragments.size(); i++) {
+		for (int i=0; i<included.length; i++) {
 			System.out.print(included[i]+" ");
 			if (included[i] != -1) {
 				struct.union(i, included[i]);
