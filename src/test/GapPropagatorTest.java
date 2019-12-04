@@ -7,10 +7,10 @@ import org.junit.Test;
 import main.FragmentList;
 import main.HamiltonPath;
 import main.OverlapGraph;
-
-/*
 import main.Fragment;
 import main.GapPropagator;
+
+/*
 import main.Arc;
 import main.CoupleFragments;
 import main.SemiGlobalAlignment;
@@ -30,10 +30,10 @@ public class GapPropagatorTest {
 		
 		assertEquals(path.getStart().getSource(), 3);
 		
-		/*
+		
 		GapPropagator gp = new GapPropagator(fl);
 		Fragment[] tab = gp.propagateGaps(path);
-		
+		/*
 		for (int i : path.keySet()) {
 			Arc arc = path.get(i);
 			Fragment f = fl.get(arc.getSource());
@@ -52,6 +52,14 @@ public class GapPropagatorTest {
 		for (int i=0; i<tab.length; i++) 
 			System.out.println("ici - "+tab[i]);
 		*/
+		assertEquals(tab[0], new Fragment("tccgaagtctgct----------------------------------"));
+		assertEquals(tab[1], new Fragment("---------tgctgctggag---------------------------"));
+		assertEquals(tab[2], new Fragment("----------actactag-gcc-------------------------"));
+		assertEquals(tab[3], new Fragment("----------------ag-gtcaactgatc-----------------"));
+		assertEquals(tab[4], new Fragment("---------------------caactg-ccaaaaa------------"));
+		assertEquals(tab[5], new Fragment("----------------------aac---ccaaaaagggg--------"));
+		assertEquals(tab[6], new Fragment("-----------------------------------gggggggtcggt"));
+		
 	}
 
 }

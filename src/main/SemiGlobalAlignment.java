@@ -2,6 +2,21 @@ package main;
 
 public class SemiGlobalAlignment {
 	
+	/**
+	 * An inner class that stores two int corresponding to the two indices to get an element in the alinmentMatrix
+	 *
+	 */
+	private class MatrixIndices {
+		
+		private int line;
+		private int column;
+		
+		private MatrixIndices(int line, int column) {
+			this.line = line;
+			this.column = column;
+		}
+	}
+	
 	public static final short GAP_PENALTY = -2;
 	public static final short MATCH_SCORE = 1;
 	public static final short MISMATCH_SCORE = -1;	
@@ -10,12 +25,12 @@ public class SemiGlobalAlignment {
 	private Fragment g;
 	
 	/**
-	 * The size of f
+	 * (size of f)+1
 	 */
 	private int n;
 	
 	/**
-	 * The size of g
+	 * (size of g)+1
 	 */
 	private int m;
 	
@@ -53,11 +68,20 @@ public class SemiGlobalAlignment {
 		}
 	}
 	
+
 	/**
-	 * Check match or mismatch
-	 * @param x index of the first value to compare
-	 * @param y index of the second value to compare
-	 * @return true if values match, false if not
+	 * Used for testing
+	 * @return the alignmentMatrix
+	 */
+	public short[][] getMatrix() {
+		return alignmentMatrix;
+	}
+	
+	/**
+	 * Check if the xth byte of f match the yth of g
+	 * @param x index of the first byte to compare
+	 * @param y index of the second byte to compare
+	 * @return the score of a match if the bytes compared are equals, the score of a mismatch else
 	 */
 	public short matchValue(int x, int y) {
 		int xTest = x-1;
@@ -82,15 +106,11 @@ public class SemiGlobalAlignment {
 			}
 		}
 		if (alignmentMatrix[n-1][m-1] > score) { //Si on se trouve sur la case en bas a droite
-			MatrixMove nextCase = getNextCase(n-1, m-1);
-			if (nextCase.getLine() != n-2 || nextCase.getColumn() != m-1)
+			MatrixIndices nextCase = getNextCase(n-1, m-1);
+			if (nextCase.line != n-2 || nextCase.column != m-1)
 				iMax = n-1;
 		}
 		return iMax;
-	}
-		
-	public short[][] getMatrix() {
-		return alignmentMatrix;
 	}
 	
 	/**
@@ -108,8 +128,8 @@ public class SemiGlobalAlignment {
 			}
 		}
 		if (alignmentMatrix[n-1][m-1] > score) { //Si on se trouve sur la case en bas a droite
-			MatrixMove nextCase = getNextCase(n-1, m-1);
-			if (nextCase.getLine() != n-1 || nextCase.getColumn() != m-2)
+			MatrixIndices nextCase = getNextCase(n-1, m-1);
+			if (nextCase.line != n-1 || nextCase.column != m-2)
 				iMax = m-1;
 		}
 		return iMax;
@@ -125,11 +145,11 @@ public class SemiGlobalAlignment {
 		if (iMax == 0) 	// f -> g de poids 0
 			return 0;
 		else {
-			MatrixMove startCase = new MatrixMove(n-1, iMax);
-			MatrixMove endCase = buildAlignment(startCase, false, null, null);
+			MatrixIndices startCase = new MatrixIndices(n-1, iMax);
+			MatrixIndices endCase = buildAlignment(startCase);
 			
-			if (endCase.getLine() > 0) // f -> g avec comme poids le score de l'alignement semi-global
-				return alignmentMatrix[startCase.getLine()][startCase.getColumn()];
+			if (endCase.line > 0) // f -> g avec comme poids le score de l'alignement semi-global
+				return alignmentMatrix[startCase.line][startCase.column];
 			else 	// f inclus a g
 				return -1;
 		}
@@ -145,44 +165,43 @@ public class SemiGlobalAlignment {
 		if (iMax == 0) 
 			return 0;
 		else {
-			MatrixMove startCase = new MatrixMove(iMax, m-1);
-			MatrixMove endCase = buildAlignment(startCase, false, null, null);
+			MatrixIndices startCase = new MatrixIndices(iMax, m-1);
+			MatrixIndices endCase = buildAlignment(startCase);
 
-			if (endCase.getColumn() > 0) // g -> f
-				return alignmentMatrix[startCase.getLine()][startCase.getColumn()];
+			if (endCase.column > 0) // g -> f
+				return alignmentMatrix[startCase.line][startCase.column];
 			else // g inclus a f
 				return -1;
 		}
 	}
 	
 	/**
-	 * Write the founded words on the fAligned and gAligned attributes
-	 * @param start
-	 * @return
+	 * Return the semi-global alignment f->g. This method doesn't work if the score of f->g is equal to zero. 
+	 * @return A pair of FragmentBuilder. The first is f and the second is g and both are aligned following the f->g alignment
 	 */
 	public CoupleFragments retrieveWordsAligned() {
 
 		FragmentBuilder fAligned = new FragmentBuilder();
 		FragmentBuilder gAligned = new FragmentBuilder();		
 		
-		MatrixMove start = new MatrixMove(n-1, getMaxLastLine());
+		MatrixIndices start = new MatrixIndices(n-1, getMaxLastLine());
 		
-		for (int i=0; i<n-1-start.getLine(); i++) {
+		for (int i=0; i<n-1-start.line; i++) {
 			fAligned.addFirst(f.byteAt(n-2-i));
 			gAligned.addFirst((byte)4);
 		}
-		for (int i=0; i<m-1-start.getColumn(); i++) {
+		for (int i=0; i<m-1-start.column; i++) {
 			fAligned.addFirst((byte)4);
 			gAligned.addFirst(g.byteAt(m-2-i));
 		}
 		
-		MatrixMove end = buildAlignment(start, true, fAligned, gAligned);
+		MatrixIndices end = buildAlignment(start, fAligned, gAligned);
 		
-		for (int i=end.getLine(); i>0; i--) {
+		for (int i=end.line; i>0; i--) {
 			fAligned.addFirst(f.byteAt(i-1));
 			gAligned.addFirst((byte)4);
 		}
-		for (int i=end.getColumn(); i>0; i--) {
+		for (int i=end.column; i>0; i--) {
 			fAligned.addFirst((byte)4);
 			gAligned.addFirst(g.byteAt(i-1));
 		}
@@ -191,75 +210,88 @@ public class SemiGlobalAlignment {
 	}
 	
 	/**
-	 * 
-	 * @param startCase
+	 * Used to build the alignment from the last byte to the first without storing the alignment itself
+	 * @param startCase 
+	 * @return
 	 */
-	private MatrixMove buildAlignment(MatrixMove startCase, boolean saveAlignment, FragmentBuilder fList, FragmentBuilder gList) {
-		MatrixMove nextCase = new MatrixMove(startCase.getLine(), startCase.getColumn());
-		int x = 0, y = 0;
+	private MatrixIndices buildAlignment(MatrixIndices startCase) {
+		MatrixIndices nextCase = new MatrixIndices(startCase.line, startCase.column);
+
+		while (nextCase.line>=1 && nextCase.column>=1) 
+			nextCase = getNextCase(nextCase.line, nextCase.column);
 		
-		while (nextCase.getLine()>=1 && nextCase.getColumn()>=1) {
-			if (saveAlignment) {
-				x = nextCase.getLine();
-				y = nextCase.getColumn();
-			}
-			nextCase = getNextCase(nextCase.getLine(), nextCase.getColumn());
-			if (saveAlignment) {
-				manageNextCase(x, y, nextCase.getMove(), fList, gList);
-			}
+		return nextCase;
+	}
+	
+	/**
+	 * Used to build the alignment from the last byte to the first and storing the alignment in fAligned and gAligned
+	 * @param startCase
+	 * @param fAligned
+	 * @param gAligned
+	 * @return
+	 */
+	private MatrixIndices buildAlignment(MatrixIndices startCase, FragmentBuilder fAligned, FragmentBuilder gAligned) {
+		MatrixIndices nextCase = new MatrixIndices(startCase.line, startCase.column);
+		int x, y;
+		
+		while (nextCase.line>=1 && nextCase.column>=1) {
+			x = nextCase.line;
+			y = nextCase.column;
+
+			addNextByte(x, y, fAligned, gAligned);
+			nextCase = getNextCase(nextCase.line, nextCase.column);
 		}
 		
 		return nextCase;
 	}
 	
-	private void manageNextCase(int line, int column, MatrixMove.MoveType oldMove, FragmentBuilder fBuilder, FragmentBuilder gBuilder) {
-
-		if (oldMove == MatrixMove.MoveType.LEFT) {
-			fBuilder.addFirst((byte)4);
+	private void addNextByte(int line, int column, FragmentBuilder fBuilder, FragmentBuilder gBuilder) {
+		if (matchDiag(line, column)) {  
+			fBuilder.addFirst(f.byteAt(line-1));
 			gBuilder.addFirst(g.byteAt(column-1));
 		}
-		else if (oldMove == MatrixMove.MoveType.UP) {
+		else if (matchUp(line, column)) {
 			fBuilder.addFirst(f.byteAt(line-1));
 			gBuilder.addFirst((byte)4);
 		}
-		else if (oldMove == MatrixMove.MoveType.DIAG) {  
-			fBuilder.addFirst(f.byteAt(line-1));
+		else {
+			fBuilder.addFirst((byte)4);
 			gBuilder.addFirst(g.byteAt(column-1));
 		}
-		//else
-		//	throw new IllegalArgumentException("MoveType ne peut pas être null");
-		 
 	}
 	
 	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @return
+	 * Determines if the score in a specified case of the matrix comes from the above, the left or the top-left case and return this case.
+	 * @param x the line of the matrix case
+	 * @param y the column of the matrix case
+	 * @return the matrix case from which comes the one given as input
 	 */
-	private MatrixMove getNextCase(int x, int y) {
+	private MatrixIndices getNextCase(int x, int y) {
 		int i = x;
 		int j = y;
+		
+		if (matchDiag(i, j)) {
+			i = i-1;
+			j = j-1;
+		}
+		else if (matchUp(i, j)) 
+			i = i-1;
+		else //if (matchLeft(i, j))
+			j = j-1;
+	
+		return new MatrixIndices(i, j);
+	}
+	
+	private boolean matchUp(int i, int j) {
+		int score = alignmentMatrix[i][j];
+		int scoreUp = alignmentMatrix[i-1][j];
+		return score == scoreUp + GAP_PENALTY;
+	}
+	
+	private boolean matchDiag(int i, int j) {
 		int score = alignmentMatrix[i][j];
 		int scoreDiag = alignmentMatrix[i-1][j-1];
-		int scoreUp = alignmentMatrix[i-1][j];
-		//int scoreLeft = alignmentMatrix[i][y-1];
-		MatrixMove.MoveType move = null;
-		
-		if (score == scoreDiag + matchValue(i, j)) {
-			i = i-1;
-			j = j-1;
-			move = MatrixMove.MoveType.DIAG;
-		}
-		else if (score == scoreUp + GAP_PENALTY) {
-			i = i-1;
-			move = MatrixMove.MoveType.UP;
-		}
-		else {
-			j = j-1;
-			move = MatrixMove.MoveType.LEFT;
-		}
-		return new MatrixMove(i, j, move);
+		return score == scoreDiag + matchValue(i, j);
 	}
 	
 	@Override
@@ -276,5 +308,4 @@ public class SemiGlobalAlignment {
 		}
 		return builder.toString();
 	}
-	
 }
