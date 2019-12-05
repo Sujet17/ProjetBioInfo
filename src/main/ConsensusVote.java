@@ -50,6 +50,7 @@ public class ConsensusVote {
 		short[] cntTab = new short[4];
 		
 		//Pour chaque colonne, compter le nombre de 'a'(0), 'c'(1), 't'(2), 'g'(3), '-'(4)
+		
 		for(int j=0; j<fragmentSize; j++) {
 			for(int i=0; i<fragTab.length; i++) {
 				if (fragTab[i].byteAt(j) != 0)

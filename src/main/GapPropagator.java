@@ -11,8 +11,6 @@ public class GapPropagator {
 	
 	private FragmentList fragments;
 	
-	private int[] maxIndices;
-	
 	private FragmentBuilder[] result;
 	
 	/**
@@ -29,27 +27,22 @@ public class GapPropagator {
 	 * @return An array of fragments which contains all the aligned fragments from the hamilton path
 	 */
 	public Fragment[] propagateGaps(HamiltonPath path) {
-		maxIndices = new int[path.size()+1];
 		result = new FragmentBuilder[path.size()+1];
 
-		
 		Arc arc = path.getStart();
-		
 		AlignedFragments couple = getFragmentsFromArc(arc);
 		
 		FragmentBuilder g1, g2, h=null;
 		
-		int i = 0;
-		
-		addToResult(0, couple.f);
-		
+		result[0] = couple.f;
 		g1 = couple.g;
 		
+		int i = 0;
 		for (i=1; i<path.size(); i++) {
 			
-			System.out.println("Cnt : "+i);
+			//System.out.println("Cnt : "+i);
 			
-			addToResult(i, g1);
+			result[i] = g1; 
 			arc = path.get(arc.getDestination());
 			
 			couple = getFragmentsFromArc(arc);
@@ -104,17 +97,11 @@ public class GapPropagator {
 		return tab;
 	}
 	
-	private void addToResult(int index, FragmentBuilder fb) {
-		result[index] = fb;
-		maxIndices[index] = fb.size();
-	}
-	
 	private void insertGap(int resultIndex, int gapIndex) {
 		for (int i = resultIndex; i>=0; i--) {
-			if (gapIndex < maxIndices[i]) {
+			if (gapIndex < result[i].size()) {
 				//System.out.println("Bonjour "+i);
 				result[i].insert(gapIndex, (byte)0);
-				maxIndices[i]++;
 			}
 			else
 				break;

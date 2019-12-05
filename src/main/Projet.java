@@ -29,7 +29,7 @@ public class Projet {
 		
 		Fragment f = ConsensusVote.consensusVote(t);
 		
-		timeMonitor.measure("Total time");
+		timeMonitor.measure("Time to vote the consensus");
 		
 		FragmentList.writeToFile(f, Integer.toString(10000), "Collections/"+targetSize+"/result"+collectionNumber+".fasta");
 		FragmentList.writeToFile(f.getComplementary(), Integer.toString(10000), "Collections/"+targetSize+"/result-ic"+collectionNumber+".fasta");

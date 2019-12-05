@@ -3,7 +3,7 @@ package main;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class FragmentBuilder implements Iterable<Byte>{
+public class FragmentBuilder{
 	
 	private int startGaps;
 	private int endGaps;	
@@ -74,39 +74,6 @@ public class FragmentBuilder implements Iterable<Byte>{
 	public Iterator<Byte> innerIterator() {
 		return byteList.iterator();
 	}
-
-    @Override
-    public Iterator<Byte> iterator() {
-        return new Iterator<Byte>() {
-
-            private int currentIndex = 0;
-            private Iterator<Byte> iterator;
-
-            @Override
-            public boolean hasNext() {
-                return currentIndex < size();
-            }
-
-            @Override
-            public Byte next() {
-            	byte result = 0;
-            	if (currentIndex == startGaps) {
-            		iterator = byteList.iterator();
-            		result = iterator.next();
-            	}
-            	if (currentIndex > startGaps && currentIndex < startGaps+byteList.size()) 
-            		result = iterator.next();
-            	
-            	currentIndex++;
-                return result;
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
 	
 	@Override
 	public String toString() {
