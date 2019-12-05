@@ -10,17 +10,17 @@ public class FragmentTest {
 
 	@Test
 	public void testByteFromChar() {
-		assertTrue(Fragment.byteFromChar('a') == 0);
-		assertTrue(Fragment.byteFromChar('c') == 1);
-		assertTrue(Fragment.byteFromChar('t') == 2);
-		assertTrue(Fragment.byteFromChar('g') == 3);
-		assertTrue(Fragment.byteFromChar('-') == 4);	
+		assertTrue(Fragment.byteFromChar('a') == 1);
+		assertTrue(Fragment.byteFromChar('c') == 2);
+		assertTrue(Fragment.byteFromChar('t') == -1);
+		assertTrue(Fragment.byteFromChar('g') == -2);
+		assertTrue(Fragment.byteFromChar('-') == 0);	
 	}
 
 	@Test
 	public void testCharFromByte() {
-		assertTrue(Fragment.charFromByte((byte)1) == 'c');	
-		assertTrue(Fragment.charFromByte((byte)2) == 't');	
+		assertTrue(Fragment.charFromByte((byte)1) == 'a');	
+		assertTrue(Fragment.charFromByte((byte)2) == 'c');	
 	}
 
 	@Test

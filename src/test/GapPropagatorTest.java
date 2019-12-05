@@ -10,11 +10,11 @@ import main.OverlapGraph;
 import main.Fragment;
 import main.GapPropagator;
 
-/*
+
 import main.Arc;
-import main.CoupleFragments;
+import main.AlignedFragments;
 import main.SemiGlobalAlignment;
-*/
+
 
 public class GapPropagatorTest {
 
@@ -33,7 +33,7 @@ public class GapPropagatorTest {
 		
 		GapPropagator gp = new GapPropagator(fl);
 		Fragment[] tab = gp.propagateGaps(path);
-		/*
+		
 		for (int i : path.keySet()) {
 			Arc arc = path.get(i);
 			Fragment f = fl.get(arc.getSource());
@@ -44,14 +44,14 @@ public class GapPropagatorTest {
 				g = g.getComplementary();
 			SemiGlobalAlignment sga = new SemiGlobalAlignment(f, g);
 			System.out.println(i+" : "+arc.getDestination()+" ; "+sga.getScoreFG()+ " ; f :"+f+" ; g :"+g);
-			CoupleFragments cf = sga.retrieveWordsAligned();
-			System.out.println(cf.f);
-			System.out.println(cf.g);
+			AlignedFragments af = sga.retrieveWordsAligned();
+			System.out.println(af.f);
+			System.out.println(af.g);
 		}
 		
 		for (int i=0; i<tab.length; i++) 
 			System.out.println("ici - "+tab[i]);
-		*/
+		
 		assertEquals(tab[0], new Fragment("tccgaagtctgct----------------------------------"));
 		assertEquals(tab[1], new Fragment("---------tgctgctggag---------------------------"));
 		assertEquals(tab[2], new Fragment("----------actactag-gcc-------------------------"));

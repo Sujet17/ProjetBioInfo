@@ -188,10 +188,10 @@ public class SemiGlobalAlignment {
 		
 		for (int i=0; i<n-1-start.line; i++) {
 			fAligned.addFirst(f.byteAt(n-2-i));
-			gAligned.addFirst((byte)4);
+			gAligned.addFirst((byte)0);
 		}
 		for (int i=0; i<m-1-start.column; i++) {
-			fAligned.addFirst((byte)4);
+			fAligned.addFirst((byte)0);
 			gAligned.addFirst(g.byteAt(m-2-i));
 		}
 		
@@ -199,10 +199,10 @@ public class SemiGlobalAlignment {
 		
 		for (int i=end.line; i>0; i--) {
 			fAligned.addFirst(f.byteAt(i-1));
-			gAligned.addFirst((byte)4);
+			gAligned.addFirst((byte)0);
 		}
 		for (int i=end.column; i>0; i--) {
-			fAligned.addFirst((byte)4);
+			fAligned.addFirst((byte)0);
 			gAligned.addFirst(g.byteAt(i-1));
 		}
 		
@@ -252,10 +252,10 @@ public class SemiGlobalAlignment {
 		}
 		else if (matchUp(line, column)) {
 			fBuilder.addFirst(f.byteAt(line-1));
-			gBuilder.addFirst((byte)4);
+			gBuilder.addFirst((byte)0);
 		}
 		else {
-			fBuilder.addFirst((byte)4);
+			fBuilder.addFirst((byte)0);
 			gBuilder.addFirst(g.byteAt(column-1));
 		}
 	}

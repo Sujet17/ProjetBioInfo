@@ -1,6 +1,6 @@
 package main;
 
-import java.util.ListIterator;
+import java.util.Iterator;
 
 public class Fragment {
 	
@@ -17,9 +17,9 @@ public class Fragment {
 	}
 	
 	public Fragment(FragmentBuilder builder) {
-		list  = new byte[builder.size()];
-		ListIterator<Byte> iterator = builder.listIterator();
-		for (int i=0; i<list.length; i++)
+		list  = new byte[builder.getRealSize()];
+		Iterator<Byte> iterator = builder.iterator();
+		for (int i=0; i<builder.size(); i++)
 			list[i] = (byte)iterator.next();
 	}
 	
@@ -31,16 +31,16 @@ public class Fragment {
 	 * 	 */
 	public static byte byteFromChar(char c) {
 		switch(c) {
-		case 'a':
+		case '-':
 			return 0;
-		case 'c':
+		case 'a':
 			return 1;
 		case 't':
+			return -1;
+		case 'c':
 			return 2;
 		case 'g':
-			return 3;
-		case '-':
-			return 4;
+			return -2;
 		default:
 			throw new IllegalArgumentException();
 		}
@@ -54,17 +54,17 @@ public class Fragment {
 	public static char charFromByte(byte b) {
 		switch(b) {
 		case 0:
-			return 'a';
-		case 1:
-			return 'c';
-		case 2:
-			return 't';
-		case 3:
-			return 'g';
-		case 4:
 			return '-';
+		case 1:
+			return 'a';
+		case -1:
+			return 't';
+		case 2:
+			return 'c';
+		case -2:
+			return 'g';
 		default:
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(Byte.toString(b));
 		}
 	}
 	
@@ -86,10 +86,7 @@ public class Fragment {
 	 * @return complementary of b
 	 */
 	public static byte complementaryByte(byte b) {
-		if (b >= 0 && b < 4)
-			return (byte) ((b+2)%4);
-		else
-			throw new IllegalArgumentException();
+		return (byte)-b;
 	}
 	
 

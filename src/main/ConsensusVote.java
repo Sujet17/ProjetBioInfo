@@ -4,6 +4,22 @@ public class ConsensusVote {
 	
 	private ConsensusVote() {}
 	
+	private static final byte[] byteFromInt = {1, -1, 2, -2};
+	
+	private static int getIndexFromByte(byte b) {
+		switch(b) {
+		case 1:
+			return 0;
+		case -1:
+			return 1;
+		case 2:
+			return 2;
+		case -2:
+			return 3;
+		}
+		throw new IllegalArgumentException(Byte.toString(b));
+	}
+	
 	/**
 	 * Used to find which is the most used character in a column
 	 * @param tab an array of short
@@ -36,11 +52,11 @@ public class ConsensusVote {
 		//Pour chaque colonne, compter le nombre de 'a'(0), 'c'(1), 't'(2), 'g'(3), '-'(4)
 		for(int j=0; j<fragmentSize; j++) {
 			for(int i=0; i<fragTab.length; i++) {
-				if (fragTab[i].byteAt(j) < 4)
-					cntTab[fragTab[i].byteAt(j)] ++;
+				if (fragTab[i].byteAt(j) != 0)
+					cntTab[getIndexFromByte(fragTab[i].byteAt(j))] ++;
 			}
 			
-			consensusFragment.set(j, (byte)maxIndex(cntTab));
+			consensusFragment.set(j, byteFromInt[maxIndex(cntTab)]);
 			
 			//Reinitialisation de cntTab
 			for (int i=0; i<4; i++)
@@ -49,4 +65,5 @@ public class ConsensusVote {
 		
 		return consensusFragment;
 	}
+
 }

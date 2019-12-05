@@ -63,9 +63,9 @@ public class SemiGlobalAlignmentTest {
 	public void test() {
 		
 		FragmentList fl = FragmentList.getFragmentsFromFile("Collections/test/collectionTest.fasta");
-
+		
 		SemiGlobalAlignment sga = new SemiGlobalAlignment(fl.get(1), fl.get(4));
-		assertEquals(4,sga.getScoreFG());
+		assertEquals(4, sga.getScoreFG());
 		AlignedFragments cf = sga.retrieveWordsAligned();
 		assertEquals(new Fragment(cf.f), new Fragment("aggtcaactgatc-----") );
 		assertEquals(new Fragment(cf.g), new Fragment("----caactg-ccaaaaa") );
