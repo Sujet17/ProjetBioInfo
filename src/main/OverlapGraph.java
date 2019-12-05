@@ -39,13 +39,13 @@ public class OverlapGraph {
 		
     	//IntStream.range(0, size).forEach(i -> IntStream.range(i+1,  size).parallel().forEach(j -> buildArcs(i, j)));
 			
-    	
+		
 		for (int i=0; i<size; i++) {
 			for (int j=i+1; j<size; j++) {
 				buildArcs(i, j);
 			}
 		}
-		
+				
 	}
 	
 	/*

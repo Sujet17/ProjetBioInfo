@@ -2,8 +2,8 @@ package main;
 
 public class Projet {
 	
-	public static final String targetSize = "100000";
-	public static final String collectionNumber = "2";
+	public static final String targetSize = "10000";
+	public static final String collectionNumber = "1";
 	
 	public static TimeMonitor timeMonitor;
 	

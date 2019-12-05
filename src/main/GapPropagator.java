@@ -47,7 +47,7 @@ public class GapPropagator {
 		
 		for (i=1; i<path.size(); i++) {
 			
-			System.out.println("Fragment : "+i);
+			System.out.println("Cnt : "+i);
 			
 			addToResult(i, g1);
 			arc = path.get(arc.getDestination());
@@ -57,19 +57,28 @@ public class GapPropagator {
 			g2 = couple.f;
 			h = couple.g;
 			
-			ListIterator<Byte> iteratorG2 = g2.listIterator();
-			ListIterator<Byte> iteratorH = h.listIterator();
+			int j = g1.getStartGaps();
 			
-			int j = 0;
+			g2.addStartGaps(g1.getStartGaps());
+			h.addStartGaps(g1.getStartGaps());
+			
+			ListIterator<Byte> iteratorG2 = g2.innerList().listIterator();
+			ListIterator<Byte> iteratorH = h.innerList().listIterator();
+			
 			while (j < g1.size() && j < g2.size()) {
 				byte byteG2 = iteratorG2.next();
-				iteratorH.next();
-				if (g1.get(j) != byteG2) {
-					if (g1.get(j) == 0) {
+				if (j >= h.getStartGaps())
+					iteratorH.next();
+				if (g1.byteAt(j) != byteG2) {
+					if (g1.byteAt(j) == 0) {
 						iteratorG2.previous();
-						iteratorH.previous();
 						iteratorG2.add((byte)0);
-						iteratorH.add((byte)0);
+						if (j >= h.getStartGaps()) {
+							iteratorH.previous();
+							iteratorH.add((byte)0);
+						}
+						else
+							h.addStartGaps(1);
 					}
 					else if (byteG2 == 0) {
 						insertGap(i, j);
@@ -77,11 +86,8 @@ public class GapPropagator {
 				}
 				j++;
 			}
-			if (j < g1.size()) {
-				for (int k=0; k<g1.size()-j; k++) {
-					h.add((byte)0);
-				}
-			}
+			if (j < g1.size()) 
+				h.addEndGaps(g1.size()-j);
 			
 			g1 = h;	
 		}
@@ -91,7 +97,7 @@ public class GapPropagator {
 		i = 0;
 		int size = h.size();
 		for (FragmentBuilder fb : result) {
-			fb.setRealSize(size);
+			fb.addEndGaps(size-fb.totalSize());
 			tab[i] = new Fragment(fb);
 			i++;
 		}
@@ -107,7 +113,7 @@ public class GapPropagator {
 		for (int i = resultIndex; i>=0; i--) {
 			if (gapIndex < maxIndices[i]) {
 				//System.out.println("Bonjour "+i);
-				result[i].add(gapIndex, (byte)0);
+				result[i].insert(gapIndex, (byte)0);
 				maxIndices[i]++;
 			}
 			else
@@ -144,15 +150,14 @@ public class GapPropagator {
 		FragmentBuilder fNew = new FragmentBuilder();
 		FragmentBuilder gNew = new FragmentBuilder();
 		
-		for (int i=0; i<f.size(); i++) {
-			fNew.add(f.byteAt(i));
-			gNew.add((byte)0);
-		}
-		for (int i=0; i<g.size(); i++) {
-			fNew.add((byte)0);
-			gNew.add(g.byteAt(i));
+		for (int i=0; i<f.size(); i++) 
+			fNew.addFirst(f.byteAt(i));
+		gNew.addStartGaps(f.size());
 		
-		}
+		for (int i=0; i<g.size(); i++) 
+			gNew.addFirst(g.byteAt(i));		
+		fNew.addEndGaps(f.size());
+		
 		return new AlignedFragments(fNew, gNew);
 	}
 	

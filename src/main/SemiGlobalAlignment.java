@@ -186,25 +186,33 @@ public class SemiGlobalAlignment {
 		
 		MatrixIndices start = new MatrixIndices(n-1, getMaxLastLine());
 		
-		for (int i=0; i<n-1-start.line; i++) {
-			fAligned.addFirst(f.byteAt(n-2-i));
-			gAligned.addFirst((byte)0);
-		}
-		for (int i=0; i<m-1-start.column; i++) {
-			fAligned.addFirst((byte)0);
+		for (int i=0; i<m-1-start.column; i++) 
 			gAligned.addFirst(g.byteAt(m-2-i));
-		}
+		fAligned.addEndGaps(m-1-start.column);
+		
+		if (n-1-start.line>0)
+			throw new IllegalArgumentException("ICIIII" + Integer.toString(m-1-start.column)+ " ; m = "+m+" "+start.column+" ; n = "+n+" "+start.line);
+		
+		/*
+		for (int i=0; i<n-1-start.line; i++) 
+			fAligned.addFirst(f.byteAt(n-2-i));
+		gAligned.addEndGaps(n-1-start.line);
+		*/
 		
 		MatrixIndices end = buildAlignment(start, fAligned, gAligned);
-		
-		for (int i=end.line; i>0; i--) {
+
+		for (int i=end.line; i>0; i--) 
 			fAligned.addFirst(f.byteAt(i-1));
-			gAligned.addFirst((byte)0);
-		}
-		for (int i=end.column; i>0; i--) {
-			fAligned.addFirst((byte)0);
-			gAligned.addFirst(g.byteAt(i-1));
-		}
+		gAligned.addStartGaps(end.line);
+		
+		if (end.column>0)
+			throw new IllegalArgumentException("ICIIII");
+		
+		/*
+		for (int i=end.line; i>0; i--) 
+			fAligned.addFirst(f.byteAt(i-1));
+		fAligned.addStartGaps(end.line);
+		*/
 		
 		return new AlignedFragments(fAligned, gAligned);
 	}
