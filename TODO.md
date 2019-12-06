@@ -15,7 +15,7 @@ Todo list
 - [x] Retirer fAligned et gAligned de SemiGlobalAlignment
 - [x] Gerer les gaps
 - [x] Vote de consensus
-- [ ] Test propagation gaps -> Ecrire test complet + test cas propagation gap vers le haut
+- [x] Test propagation gaps -> Ecrire test complet + test cas propagation gap vers le haut
 - [ ] Multithreading pour construction des arcs -> verifier que le multithreading ne "casse" pas la construction du chemin hamiltonien
 - [ ] Rapport
 - [x] Trouver structure de données adéquate pour FragmentBuilder -> Ameliorer new Fragment(FragmentBuilder b) en consequence

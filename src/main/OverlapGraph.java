@@ -3,9 +3,7 @@ package main;
 import java.util.concurrent.PriorityBlockingQueue;
 //import java.util.stream.IntStream;
 
-
 public class OverlapGraph {
-	
 	
 	/**
 	 * The list of the fragments
@@ -13,7 +11,7 @@ public class OverlapGraph {
 	private FragmentList fragments;	
 	
 	/**
-	 * An heap to store all the arcs of the graph
+	 * An heap to store by decreasing order all the arcs of the graph
 	 */
 	private PriorityBlockingQueue<Arc> arcs;
 	
@@ -105,21 +103,22 @@ public class OverlapGraph {
 	
 	/**
 	 * Instantiate an arc and add it to the "arcs" attribute 
-	 * @param weight 
-	 * @param indexSource 
-	 * @param indexDest
-	 * @param complSource
-	 * @param complDest
+	 * @param weight the weight of the arc
+	 * @param indexSource the index of the node from which the arc comes out
+	 * @param indexDest the index of the node where the arc goes
+	 * @param complSource true if the arc concerns the reverse complement fragment which is in the source node
+	 * @param complDest true if the arc concerns the reverse complement fragment which is in the destination node
 	 */
 	private void buildArc(int weight, int indexSource, int indexDest, boolean complSource, boolean complDest) {
 		if (weight >= 0)
 			arcs.add(new Arc(indexSource, indexDest, complSource, complDest, weight));
 		else
-			throw new IllegalArgumentException("Le poids d'un arc doit etre superieur (non strictement) a 0");
+			throw new IllegalArgumentException("The weight of an arc must >= 0");
 	}
 
 	/**
-	 * Find the hamilton path on this graph. Note that this method modifies the "arcs" attribute and thus cannot be called twice on the same object.
+	 * Find the hamilton path on this graph using a greedy algorithm. 
+	 * Note that this method modifies the "arcs" attribute and thus cannot be called twice on the same object.
 	 * @return the Hamilton Path
 	 */
 	public HamiltonPath getHamiltonPath() {
@@ -162,15 +161,7 @@ public class OverlapGraph {
 	}
 	
 	/**
-	 * print included fragments
-	 */
-	public void printIncluded() {
-		for (int i=0; i<fragments.size(); i++) 
-			System.out.print(included[i]+" ");
-	}
-	
-	/**
-	 * Used to ignore the included fragments 
+	 * Used to ignore the included fragments
 	 * @param struct
 	 */
 	public void manageIncludedFragments(UnionFind struct) {
@@ -189,32 +180,34 @@ public class OverlapGraph {
 	/**
 	 * Check if the given arc can be added to the hamilton path. 
 	 * @param struct the UnionFind structure that is used to check if the adding of the arc to the hamilton path will create a cycle
-	 * @param arc 
-	 * @param in 
-	 * @param out
+	 * @param arc the arc which is checked
+	 * @param in an array that is used to check if an arc already comes in the destination node of the arc
+	 * @param out an array that is used to check if an arc already comes out of the source node of the arc
 	 * @return true if the given arc can be added to the hamilton path, false else
 	 */
 	public boolean isAvailableArc(UnionFind struct, Arc arc, int[] in, int[] out) {
 		int f = arc.getSource();
 		int g = arc.getDestination();
-		if (included[f] == -1 && included[g] == -1 ) { //Si aucun des fragments n'est inclus dans un autre du graphe
-			if (in[g] == 0 && out[f] == 0) { //Si aucun arc choisi ne va vers g ni ne sort de f
+		if (included[f] == -1 && included[g] == -1 ) { //Check inclusions
+			if (in[g] == 0 && out[f] == 0) { //Check that no arc comes out from f or go to g
 				/*
-				 *  Si la sortie du noeud correspond avec l'entree
-				 *  Par exemple, on ne peut pas avoir l'arc f -> g' puis l'arc g -> h
+				 *  If an arc already comes out from the destination node and concerns the reverse-complement fragment of the node,
+				 *  the arc that is checked must also concerns the reverse-complement.
+				 *  The situation is similar with the source node
+				 *  For instance, if f -> g' is already selected, g -> h cannot
 				 */
 				if ( (out[g] == 0 || out[g] == getVal(arc, false)) && (in[f] == 0 || in[f] == getVal(arc, true)) ) 
-					return struct.find(f) != struct.find(g);
+					return struct.find(f) != struct.find(g); //The arc cannot create a cycle
 			}
 		}
 		return false;
 	}
 	
 	/**
-	 * 
+	 * Used to store the used fragments in the in and out arrays (while building the hamilton path)
 	 * @param arc
-	 * @param isSource
-	 * @return 2 if ..., 1 else
+	 * @param isSource true if the checking concerns the source of the arc, else the checking concerns the destination
+	 * @return 2 if in the checked node the reverse-complement is selected by the arc, 1 else
 	 */
 	private int getVal(Arc arc, boolean isSource) {
 		if ((isSource && arc.isComplSource()) || (!isSource && arc.isComplDest()))

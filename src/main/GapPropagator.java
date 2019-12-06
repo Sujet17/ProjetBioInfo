@@ -116,14 +116,15 @@ public class GapPropagator {
 	private AlignedFragments getFragmentsFromArc(Arc arc) {
 		Fragment f = fragments.get(arc.getSource());
 		Fragment g = fragments.get(arc.getDestination());
+		
+		if (arc.getWeight() == 0)
+			return juxtaposeFragments(f, g);
+		
 		if (arc.isComplSource())
 			f = f.getComplementary();
 		if (arc.isComplDest())
 			g = g.getComplementary();
 		SemiGlobalAlignment sga = new SemiGlobalAlignment(f, g);
-		int score = sga.getScoreFG();
-		if (score == 0)
-			return juxtaposeFragments(f, g);
 		return sga.retrieveWordsAligned();
 	}
 	
