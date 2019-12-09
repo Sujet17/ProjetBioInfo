@@ -49,7 +49,7 @@ public class ConsensusVote {
 		
 		short[] cntTab = new short[4];
 		
-		//Pour chaque colonne, compter le nombre de 'a'(0), 'c'(1), 't'(2), 'g'(3), '-'(4)
+		//For every row, count the number of -2(g), -1(t), 1(a) and 2(c). 0(gaps) are ignored. 
 		
 		for(int j=0; j<fragmentSize; j++) {
 			for(int i=0; i<fragTab.length; i++) {

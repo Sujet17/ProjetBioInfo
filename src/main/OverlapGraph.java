@@ -1,7 +1,8 @@
 package main;
 
+import java.util.Vector;
 import java.util.concurrent.PriorityBlockingQueue;
-//import java.util.stream.IntStream;
+import java.util.stream.IntStream;
 
 public class OverlapGraph {
 	
@@ -21,26 +22,26 @@ public class OverlapGraph {
 	 * If x == -1, that means that the ith fragment is not included to another fragment in the list;
 	 * Else, that means that the ith fragment is included in the xth.
 	 */
-	private int[] included;
+	private Vector<Integer> included;
 	
 	
 	public OverlapGraph(FragmentList fragments) {
 		this.fragments = fragments;
 		
 		int size = fragments.size();
-		included = new int[size];
+		included = new Vector<Integer>(size);
 		for (int i=0; i<size; i++)
-			included[i] = -1;
+			included.add(-1);
 		
 		arcs = new PriorityBlockingQueue<Arc>();		
 		
-		
-    	//IntStream.range(0, size).forEach(i -> IntStream.range(i+1,  size).parallel().forEach(j -> buildArcs(i, j)));
+		if (Projet.multithreading)
+			IntStream.range(0, size).forEach(i -> IntStream.range(i+1,  size).parallel().forEach(j -> buildArcs(i, j)));
 			
-		
-		for (int i=0; i<size; i++) {
-			for (int j=i+1; j<size; j++) {
-				buildArcs(i, j);
+		else {
+			for (int i=0; i<size; i++) {
+				for (int j=i+1; j<size; j++) 
+					buildArcs(i, j);
 			}
 		}
 				
@@ -50,9 +51,9 @@ public class OverlapGraph {
 	 * Used only for testing
 	 */
 	public OverlapGraph(int size) {
-		included = new int[size];
+		included = new Vector<Integer>(size);
 		for (int i=0; i<size; i++)
-			included[i] = -1;
+			included.set(i, -1);
 	}
 	
 	/**
@@ -63,11 +64,12 @@ public class OverlapGraph {
 	 */
 	private void buildArcs(int indexF, int indexG) {
 		
-		if (included[indexF] != -1 || included[indexG] != -1)
-			return;
-		
+
 		Fragment f = fragments.get(indexF);
 		Fragment g = fragments.get(indexG);
+		
+		if ((included.get(indexF) != -1 && f.size() < g.size()) || (included.get(indexG) != -1 && f.size() > g.size()))
+			return;
 		
 		SemiGlobalAlignment sga = new SemiGlobalAlignment(f, g);
 		SemiGlobalAlignment sga1 = new SemiGlobalAlignment(f, g.getComplementary());
@@ -80,9 +82,9 @@ public class OverlapGraph {
 		
 		if (weight1 == -1 || weight2 == -1 || weight3 == -1 || weight4 == -1) {
 			if (f.size() < g.size())
-				included[indexF] = indexG;
+				included.set(indexF, indexG);
 			else
-				included[indexG] = indexF;
+				included.set(indexG, indexF);
 			return ;
 		}
 		
@@ -137,6 +139,7 @@ public class OverlapGraph {
 		Arc arc = arcs.poll();
 		while (arc != null) {
 			if (isAvailableArc(struct, arc, in, out)) {
+				System.out.println(arc.getWeight());
 				int f = arc.getSource();
 				int g = arc.getDestination();
 				
@@ -144,7 +147,7 @@ public class OverlapGraph {
 				in[g] = getVal(arc, false);
 				out[f] = getVal(arc, true);
 				struct.union(f, g);
-			}
+			}			
 			if (struct.onlyOneSet())
 				break;
 			arc = arcs.poll();
@@ -156,7 +159,7 @@ public class OverlapGraph {
 				break;
 			}
 		}
-		
+		System.out.println("Poids total du chemin : "+path.totalWeight);
 		return path;
 	}
 	
@@ -166,10 +169,10 @@ public class OverlapGraph {
 	 */
 	public void manageIncludedFragments(UnionFind struct) {
 		int cnt = 0;
-		for (int i=0; i<included.length; i++) {
-			System.out.print(included[i]+" ");
-			if (included[i] != -1) {
-				struct.union(i, included[i]);
+		for (int i=0; i<included.size(); i++) {
+			System.out.print(included.get(i)+" ");
+			if (included.get(i) != -1) {
+				struct.union(i, included.get(i));
 				cnt++;
 			}
 		}
@@ -188,7 +191,7 @@ public class OverlapGraph {
 	public boolean isAvailableArc(UnionFind struct, Arc arc, int[] in, int[] out) {
 		int f = arc.getSource();
 		int g = arc.getDestination();
-		if (included[f] == -1 && included[g] == -1 ) { //Check inclusions
+		if (included.get(f) == -1 && included.get(g) == -1 ) { //Check inclusions
 			if (in[g] == 0 && out[f] == 0) { //Check that no arc comes out from f or go to g
 				/*
 				 *  If an arc already comes out from the destination node and concerns the reverse-complement fragment of the node,

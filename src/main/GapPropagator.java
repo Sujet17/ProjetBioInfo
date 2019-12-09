@@ -3,9 +3,7 @@ package main;
 import java.util.ListIterator;
 
 /**
- * 
- * This class manage the gap propagation step 
- *
+ * This class manage the gap propagation step.
  */
 public class GapPropagator {
 	

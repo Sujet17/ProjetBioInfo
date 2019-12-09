@@ -17,6 +17,8 @@ Todo list
 - [x] Vote de consensus
 - [x] Test propagation gaps -> Ecrire test complet + test cas propagation gap vers le haut
 - [ ] Multithreading pour construction des arcs -> verifier que le multithreading ne "casse" pas la construction du chemin hamiltonien
+- Vérifier que les fragments inclus sont gérés correctement
+- Vérifier que les arcs sont pris dans le bon ordre
 - [ ] Rapport
 - [x] Trouver structure de données adéquate pour FragmentBuilder -> Ameliorer new Fragment(FragmentBuilder b) en consequence
 - [ ] Javadoc   ->  https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html#CHDJBGFC
