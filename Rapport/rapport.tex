@@ -4,11 +4,14 @@
 \usepackage[utf8]{inputenc}  
 %\usepackage[T1]{fontenc}
 \usepackage[top = 3cm, left = 4cm, right = 4cm ]{geometry}
-%\usepackage[pdftex]{graphicx}
+\usepackage[pdftex]{graphicx}
 \usepackage{fancyhdr}
+\usepackage{colortbl}
 %\usepackage{lscape}
 %\usepackage[absolute]{textpos}
 %\usepackage{amssymb}
+
+
 
 \title{
 {\Huge \textbf{Rapport de projet}\\
@@ -32,32 +35,86 @@ Faculté des Sciences, Université de Mons}
 
 \maketitle
 
+\vspace{9cm}
+
+\begin{center}
+\begin{tabular}[t]{c c c}
+\includegraphics[height=1.5cm]{logoumons.jpg} &
+\hspace{1cm} &
+\includegraphics[height=1.5cm]{logofs.jpg}
+\end{tabular}
+\end{center}~\\
+
+
+
 \newpage
 
 \section{Introduction}
 
-L'objectif de ce projet est l'implémentation d'une solution au problème d'assemblage de fragments d'ADN. 
-Ce projet consiste à implémenter un algorithme proposant le problème d'assemblage de fragments d'ADN.
+Dans le cadre du cours d'Algorithmique et Bioinfoormatique donnée par les enseignants Olivier Delgrange et Clément Tamines, nous avons du réaliser un projet qui consiste en la résolution d'un problème lié aux fragment d'ADN.
 
- Il s'agit donc de concevoir un programme qui, prenant en entrée un ensemble de fragments d'ADN, reconstitue la séquence d'origine. Les fragments d'entrée contiennent entre 500 et 700 caractères
+\subsection{énoncé du problème}
 
-
-
-La première étape de l'algorithme utilisé ici consiste à construire un graphe dit \textit{overlap graph} dont les sommets sont les fragments et les arcs sont les poids des alignements semi-globaux entre les 
+L'objectif de ce projet est l'implémentation en java d'une solution à l'assemblage d'un fragment unique à partir d'une collection de fragments.. Un fragment est une suite de caractère (dont la longueur a été définie entre 500 et 700) composée uniquement des 4 lettres $ A, C, G $ et $T$. Ces fragments seront comparés pour plus tard construire une séquence unique. Cette séquence est évaluée avec l'outil $dotmatcher$ qui détermine la qualité de l'assemblage.
 
 
-Afin de mesurer la qualité de nos résultats, les séquences cibles associées aux différentes collections de fragments nous ont été fournies, l'outil \textit{dotmatcher} nous permettant de les com
+\subsection{Difficultés supllémentaires}
+
+Il faut prendre en compte la grande quatité de données à traiter, ainsi le travail doit efficade en temps mais aussi en mémoire.
+
+On ne sait pas dans quel sens le fragment doit être lu. Pour rappel, l'ADN est composé de deux brins, chacun ayant un sens inersé ($ 3' - 5' et 5' -3'$). Ainsi, il faut également prendre en compte les fragments complémentaires et inversés.
+
+Il y a également différentes erreurs de séquençage qui complique la lecture des fragments.
 
 \section{Répartition du travail}
 
-Voici une table résumant la répartition des étapes du projet.
 
+Ce travail a été réalisé en plusieurs semaines. La quantité de travail à accomplir nous a poussé à avoir recours au logiciel $Git$ afin de pouvoir travailler à distance. De nombreuses séances de travail à l'univertisté ont également été organisées. La totalité des étapes du travail, allant de la réflexion à l'implémentation ont été accomplies en duo.
 
+Malgré un retard marqué par une première séance de mise au point peu développée, nous avons pu progresser à grande vitesse pour pouvoir organiser un seconde mise au point et ainsi nous mettre à jour par rapport au temps restant.
 
+\newpage
 
 \section{\'Etapes clés}
 
+La réalisation du projet s'eefectue en 6 étapes principales : (+++ ITEMIZE ?+++)
+
+\begin{itemize}
+\item L'aglignement semi global
+\item L'overlap graph : la seconde étape est la construction d'un graphe dont les sommets sont les fragments et les arcs sont les poids des alignements semi globaux
+\item 
+\item 
+\end{itemize}
+
+
 \subsection{Alignement semi-global}
+
+
+atgtct
+gtcccg
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+		\hline
+		 & & G & T & C & C & C & G
+		\\\hline
+		&0&0&0&0&0&0&0
+		\\\hline
+        		A&0&-1&-1&-1&-1&-1&-1
+		\\\hline
+		T&0&-1&0&-1&2&0&0
+		\\\hline
+		G&0&-1&-2&-1&0&3&1
+		\\\hline
+		T&0&-1&-2&-3&-2&1&\cellcolor[gray]{0.8}2
+		\\\hline
+		C&0&-1&-2&-3&-4&-1&0
+		\\\hline
+		T&0&-1&-2&-1&-3&-3&-2
+		\\\hline
+	\end{tabular}
+\end{table}
 
 \subsection{Overlap graph}
 
@@ -132,15 +189,27 @@ Pour stocker ces fragments en construction, il faut une structure permettant fac
 
 \subsection{Vote de consensus}
 
-Le vote de consensus est l'étape où est construit le fragment qui sera donné en sortie. Il s'agit de retourner un fragment tel que son $i^{eme}$ caractère est le caractère le plus présent dans la $i^{eme}$ colonne du tableau construit pendant l'étape de propagation des gaps.
+Finalement, il ne reste qu'à construire le fragment qui sera donné en sortie. Ce dernier va être peu à peu contruit grace au $Vote de consensus$. Cet étape consiste pour chaque colonne du tableau qui a été construit lors de la propagation des gaps à en extraire le caractère le plus redondant, et ainsi obtenir le fragment à retourner.
+
+Cepebdant il est possible que plusieurs caractères soient présent le même nombre de fois dans une colonne. Dans ce cas, le premier d'entre eux sera selectionné comme caractère du fragment à retourner.
 
 \section{Qualité du projet}
 
-\subsection{Points faibles}
+Nous avons eu recours aux streams pour la construction des arcs du graphe. Le multithreading est la capacité à pouvoir effectuer plusieurs taches ($threads$) simultanément. Le principal avantage est le gain de temps très important qu'apporte cette méthode,. Cependant, comme les taches sont gérer en même temps , les résultats ne sont pas déterministes et peuvent engendrer des problèmes (+++ problèmes +++)
 
-\subsection{Points forts}
+Durant la réalisation du projet une grande quantité de test ont été implémentés. Cela a permis non seulement de pouvoir détecter rapidement d'éventuelles erreurs, mais également de pouvoir continuer le travail sans avoir de doute quand aux différentes classes et méthodes déja implémentées.
+
+
 
 \section{Conclusion}
+
+(+++ j'ai pas fait le blabla dans le SGA juste la table (pour l'instant je m'en occupe si tu veux)  - est ce que scinder l'intro est une bonne idée ? - est ce qu'il fut rajouter du contenu dans l'intro ? -  la répartition du travail est brève je sais aps si ça leur suffira -  j'ai refais le vote de consensus -  qualité du projet incomplet selon moi - pas d'inspi pour la conclusion +++)
+
+utilisation de structure donné nouvelle
+
+progression nette7
+
+cependant - amélioration du résultat (lacune en bio)
 
 
 \end{document}
