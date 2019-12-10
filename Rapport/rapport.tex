@@ -36,56 +36,103 @@ Faculté des Sciences, Université de Mons}
 
 \section{Introduction}
 
-\subsection{Enoncé du problème}
+L'objectif de ce projet est l'implémentation d'une solution au problème d'assemblage de fragments d'ADN. 
+Ce projet consiste à implémenter un algorithme proposant le problème d'assemblage de fragments d'ADN.
 
-Ce projet consiste en la résolution d'un problème complexe lié à l'assemblage de fragments d'ADN.
+ Il s'agit donc de concevoir un programme qui, prenant en entrée un ensemble de fragments d'ADN, reconstitue la séquence d'origine. Les fragments d'entrée contiennent entre 500 et 700 caractères
 
-\subsection{Rappel des objectifs}
 
-Pour atteindre la résolution du problème, il faut concevoir un programme capable  à partir d'une collection de fragments de fournir une séquence cible. Ce programme doit :
-\vspace{0.5cm}
-\begin{itemize}
-\item appliquer bonnes notions d'algorithmique et de bonnes pratique de programmation.
-\item être optimisé en temps et en mémoire face à la grande quantité de donnée
-\item utiliser l'appoximation de type Greedy pour l'assemblage et l'alignement semi-global pour la ressemblance entre fragments.
-\item pourvoir être évalué sur ces résultats via l'outil de $dotmatcher$
-\end{itemize} 
+
+La première étape de l'algorithme utilisé ici consiste à construire un graphe dit \textit{overlap graph} dont les sommets sont les fragments et les arcs sont les poids des alignements semi-globaux entre les 
+
+
+Afin de mesurer la qualité de nos résultats, les séquences cibles associées aux différentes collections de fragments nous ont été fournies, l'outil \textit{dotmatcher} nous permettant de les com
 
 \section{Répartition du travail}
 
 Voici une table résumant la répartition des étapes du projet.
 
-\begin{table}[!htbp]
-\begin{center}
-\begin{tabular}{|p{3cm}||p{2.5cm}|p{3cm}|}
-\hline
-\textbf{Etape} & Catégorie & Gestion\\
-\hline\hline
-blabla & balbalbla & ablaba\\
-\hline
-\\
-\hline
-\\
-\hline
-\\
-\hline
-\\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
 
-\section{Etapes clés}
 
-\subsection{OverlapGraph}
+
+\section{\'Etapes clés}
+
+\subsection{Alignement semi-global}
+
+\subsection{Overlap graph}
+
+La première étape de cet algorithme est la construction de l'overlap graph. Il s'agit de créer un graphe dont les sommets sont les fragments donnés en entrée et leurs complémentaires-inversés. Ce graphe est orienté et pondéré. Un arc $f\to g$ de poids $w$ existe entre $f$ et $g$ si l'alignement semi-global entre $f$ et $g$ est de poids $w$.
+
+Pour construire ce graphe, il faut donc rechercher l'alignement semi-global optimal pour chaque paire de fragments du graphe (excepté les paires constituées d'un fragment et son complémentaire-inversé). C'est à cette étape que sont détectées les inclusions entre fragments. Nous avons pris le parti de retirer du graphe les fragments inclus à d'autres.
+
+Puisque le graphe est construit dans l'unique but de parcourir les arcs par ordre décroissant pour construire le chemin hamiltonien, nous avons choisi de mettre tous les arcs dans un tas où ils seraient triés en fonction de leur poids.
+
+\textit{PriorityBlockingQueue}\footnote{https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/PriorityBlockingQueue.html}
+
+Pour la suite, nous nommerons $f'$ le fragment complémentaire-inversé d'un fragment $g$. 
+
+Chaque nœud d'un graphe contient un fragment $f$ et son complémentaire-inversé $f'$. Ce choix est expliqué dans la section suivante.
+
+Conséquemment, chaque arc du graphe est caractérisé par sa source, sa destination, son poids, un
 
 \subsection{Chemin hamiltonien}
 
+Pour construire le chemin hamiltonien, nous allons retirer successivement sa racine au tas qui contient les arcs pour parcourir les arcs dans l'ordre décroissant. L'algorithme utilisé est très proche de l'algorithme de Kruskal, qui sert à la construction de l'arbre couvrant de poids minimal d'un graphe.
+Pendant ce parcours des arcs, un arc $f \to g$ est accepté dans le chemin hamiltonien si :
+
+\begin{itemize}
+\item pour tous les arcs $i \to j$ déjà choisis dans le chemin, $i \neq f'$ et $j \neq f'$  ($f'$ étant le complémentaire-inversé de $f$)
+\item pour tous les arcs $i \to j$ déjà choisis dans le chemin, $i \neq g'$ et $j \neq g'$  ($g'$ étant le complémentaire-inversé de $g$)
+\item ajouter $f \to g$ au chemin ne va pas créer de cycle
+\item pour tous les arcs $i \to j$ déjà choisis dans le chemin, $i \neq f$ et $j \neq g$.
+\end{itemize}
+
+
+
 \subsection{Propagation des gaps}
 
-Pour classer les fragments, d'abord pensé aux abr équilibrés, ensuite tri par tas et puis hashmap
+Cette étape consiste à transformer le chemin hamiltonien construit à l'étape précédente en un ensemble de fragments alignés. Pour la suite, nous appellerons consécutifs deux arcs du chemin tels que la destination du premier est la source du second.
+
+A chaque arc correspond un alignement semi-global entre les deux fragments qui sont les extrémités de cet arc.
+Pour chaque paire d'arcs consécutifs du chemin, il faut donc aligner le $g$ obtenu depuis l'arc $f \to g$ avec le g obtenu depuis l'arc $g \to h$.
+
+
+\begin{verbatim}
+tccgaagtctgct----------------------------------
+---------tgctgctggag---------------------------
+----------actactag-gcc-------------------------
+----------------ag-gtcaactgatc-----------------
+---------------------caactg-ccaaaaa------------
+----------------------aac---ccaaaaagggg--------
+-----------------------------------gggggggtcggt
+\end{verbatim}
+
+
+
+
+
+Le chemin hamiltonien est un ensemble d'arcs 
+
+La propagation des gaps consiste donc à aligner les paires consécutives, et à propager vers toutes les paires précédentes et suivantes les gaps induits par cet alignement.
+
+Trois solutions ont été envisagées pour avoir un accès rapide au fragment voulu dans le chemin hamiltonien.
+\begin{itemize}
+\item Utiliser un arbre de recherche équilibré 
+\item Utiliser une table de hachage permettant de retrouver un arc en fonction de sa destination ou de sa source
+
+
+\item Utiliser une table de hachage permettant de retrouver un arc en fonction de sa source
+\end{itemize}
+
+
+
+Pour classer les fragments, d'abord pensé aux abr équilibrés (\textit{TreeSet}\footnote{https://docs.oracle.com/javase/7/docs/api/java/util/TreeSet.html} de java), et puis hashmap
+
+Pour stocker ces fragments en construction, il faut une structure permettant facilement l'insertion d'un caractère à un indice donné. Les \textit{LinkedList} de java, qui sont des listes doublement chaînées, ont été choisies.
 
 \subsection{Vote de consensus}
+
+Le vote de consensus est l'étape où est construit le fragment qui sera donné en sortie. Il s'agit de retourner un fragment tel que son $i^{eme}$ caractère est le caractère le plus présent dans la $i^{eme}$ colonne du tableau construit pendant l'étape de propagation des gaps.
 
 \section{Qualité du projet}
 

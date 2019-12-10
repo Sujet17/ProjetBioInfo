@@ -2,8 +2,8 @@ package main;
 
 public class Projet {
 	
-	public static final String targetSize = "16320";
-	public static final String collectionNumber = "5";
+	public static final String targetSize = "10000";
+	public static final String collectionNumber = "1";
 	public static final Boolean writeOnfile = true;
 	
 	public static final boolean multithreading = true;
@@ -36,8 +36,8 @@ public class Projet {
     		timeMonitor.measure("Time to vote the consensus");
     		
     		if (writeOnfile) {
-    			FragmentList.writeToFile(f, Integer.toString(10000), "Collections/"+targetSize+"/result"+collectionNumber+".fasta");
-    			FragmentList.writeToFile(f.getComplementary(), Integer.toString(10000), "Collections/"+targetSize+"/result-ic"+collectionNumber+".fasta");
+    			FragmentList.writeToFile(f, targetSize, "Collections/"+targetSize+"/result"+collectionNumber+".fasta");
+    			FragmentList.writeToFile(f.getComplementary(), targetSize, "Collections/"+targetSize+"/result-ic"+collectionNumber+".fasta");
     		}
     	}
     	/*
