@@ -51,18 +51,18 @@ Faculté des Sciences, Université de Mons}
 
 \section{Introduction}
 
-Dans le cadre du cours d'Algorithmique et Bioinfoormatique donnée par les enseignants Olivier Delgrange et Clément Tamines, nous avons du réaliser un projet qui consiste en la résolution d'un problème lié aux fragment d'ADN.
+Dans le cadre du cours d'Algorithmique et BioInformatique donné par les enseignants Olivier Delgrange et Clément Tamines, nous avons du réaliser un projet qui consiste en la résolution d'un problème lié aux fragments d'ADN.
 
 \subsection{énoncé du problème}
 
-L'objectif de ce projet est l'implémentation en java d'une solution à l'assemblage d'un fragment unique à partir d'une collection de fragments.. Un fragment est une suite de caractère (dont la longueur a été définie entre 500 et 700) composée uniquement des 4 lettres $ A, C, G $ et $T$. Ces fragments seront comparés pour plus tard construire une séquence unique. Cette séquence est évaluée avec l'outil $dotmatcher$ qui détermine la qualité de l'assemblage.
+L'objectif de ce projet est l'implémentation en java d'une solution à l'assemblage d'un fragment unique à partir d'une collection de fragments.. Un fragment est une suite de caractères (dont la longueur a été définie entre 500 et 700) composée uniquement des 4 lettres $ A, C, G $ et $T$. Ces fragments sont comparés pour construire une séquence unique. Cette séquence est évaluée avec l'outil $dotmatcher$ qui détermine la qualité de l'assemblage.
 
 
 \subsection{Difficultés supllémentaires}
 
-Il faut prendre en compte la grande quatité de données à traiter, ainsi le travail doit efficade en temps mais aussi en mémoire.
+Il faut prendre en compte la grande quatité de données à traiter, ainsi le travail doit êtr efficace en temps mais aussi en mémoire.
 
-On ne sait pas dans quel sens le fragment doit être lu. Pour rappel, l'ADN est composé de deux brins, chacun ayant un sens inersé ($ 3' - 5' et 5' -3'$). Ainsi, il faut également prendre en compte les fragments complémentaires et inversés.
+On sait dans quel sens le fragment doit être lu, mais on ne peut pas le voir sur un fragment. Pour rappel, l'ADN est composé de deux brins, chacun ayant un sens inersé ($ 3' - 5' et 5' -3'$). Ainsi, il faut également prendre en compte les fragments complémentaires et inversés.
 
 Il y a également différentes erreurs de séquençage qui complique la lecture des fragments.
 
@@ -189,15 +189,15 @@ Pour stocker ces fragments en construction, il faut une structure permettant fac
 
 \subsection{Vote de consensus}
 
-Finalement, il ne reste qu'à construire le fragment qui sera donné en sortie. Ce dernier va être peu à peu contruit grace au $Vote de consensus$. Cet étape consiste pour chaque colonne du tableau qui a été construit lors de la propagation des gaps à en extraire le caractère le plus redondant, et ainsi obtenir le fragment à retourner.
+Finalement, il ne reste qu'à construire le fragment qui sera donné en sortie. Ce dernier va être peu à peu contruit grace au $ConsensusVote$. Cet étape consiste pour chaque colonne du tableau qui a été construite lors de la propagation des gaps à en extraire le caractère le plus redondant, et ainsi obtenir le fragment à retourner.
 
-Cepebdant il est possible que plusieurs caractères soient présent le même nombre de fois dans une colonne. Dans ce cas, le premier d'entre eux sera selectionné comme caractère du fragment à retourner.
+Cependant il est possible que plusieurs caractères soient présents le même nombre de fois dans une colonne. Dans ce cas, nous avons définis un ordre de préférence arbitraire qui va déterminer lequel est choisi parmis ces derniers.
 
 \section{Qualité du projet}
 
-Nous avons eu recours aux streams pour la construction des arcs du graphe. Le multithreading est la capacité à pouvoir effectuer plusieurs taches ($threads$) simultanément. Le principal avantage est le gain de temps très important qu'apporte cette méthode,. Cependant, comme les taches sont gérer en même temps , les résultats ne sont pas déterministes et peuvent engendrer des problèmes (+++ problèmes +++)
+Nous avons eu recours aux streams pour la construction des arcs du graphe. Le multithreading est la capacité à pouvoir effectuer plusieurs taches ($threads$) simultanément. Le principal avantage est le gain de temps très important qu'apporte cette méthode. Cependant, comme les taches sont gérer en même temps , les résultats peuvent ne pas être cohérent. Le problème majeur de cette méthode est le non déterminisme des résultats.
 
-Durant la réalisation du projet une grande quantité de test ont été implémentés. Cela a permis non seulement de pouvoir détecter rapidement d'éventuelles erreurs, mais également de pouvoir continuer le travail sans avoir de doute quand aux différentes classes et méthodes déja implémentées.
+Durant la réalisation du projet une grande quantité de tests ont été implémentés. Cela a permis non seulement de pouvoir détecter rapidement d'éventuelles erreurs, mais également de pouvoir continuer le travail sans avoir de doute quand aux différentes classes et méthodes déja implémentées.
 
 
 
