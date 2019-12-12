@@ -1,24 +1,25 @@
 package main;
 
+
 public class Arc implements Comparable<Arc> {
 	
 	/**
-	 * The index of the source node of this edge
+	 * The index of the source node of this arc
 	 */
 	private int source;
 	
 	/**
-	 * The index of the destination node of this edge
+	 * The index of the destination node of this arc
 	 */
 	private int dest;
 	
 	/**
-	 * True if this edge starts from the complementary-reversed fragment of the source node
+	 * True if this arc starts from the complementary-reversed fragment of the source node
 	 */
 	private boolean complSource;
 	
 	/**
-	 * True if this edge comes to the complementary-reversed fragment of the destination node
+	 * True if this arc comes to the complementary-reversed fragment of the destination node
 	 */
 	private boolean complDest;
 	

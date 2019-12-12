@@ -34,7 +34,6 @@ public class FragmentBuilder{
 	}
 	
 	/**
-	 * 
 	 * @param index
 	 * @return the byte at the specified index
 	 */
@@ -60,6 +59,15 @@ public class FragmentBuilder{
 		innerList.addLast(b);
 	}
 	
+	/**
+	 * Insert the given byte the given index.
+	 * If the index is into the innerList zone, the byte is inserted into this list.
+	 * If the index is out the innerList zone, the byte must be a 0 (for a gap) and according to the index
+	 * the startGaps or endGaps is incremented by 1.
+	 * If the index is out the innerList zone and the byte is different from 0, an IllegalArgumentException is throwed 
+	 * @param index The index to insert the byte
+	 * @param b the byte to insert
+	 */
 	public void insert(int index, byte b) {
 		if (index == startGaps)
 			addFirst(b);

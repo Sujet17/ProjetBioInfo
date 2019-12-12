@@ -1,11 +1,22 @@
 package main;
 
+/**
+ * An non-instantiable class who provides static method to make the consensus vote step
+ */
 public class ConsensusVote {
 	
 	private ConsensusVote() {}
 	
+	/**
+	 * This array is used to know the byte corresponding to an index of cntTab (see consensusVote() method) 
+	 */
 	private static final byte[] byteFromInt = {1, -1, 2, -2};
 	
+	/**
+	 * This method is used to know the index of cntTab (see consensusVote() method) corresponding to a byte 
+	 * @param b a byte
+	 * @return an index of cntTab
+	 */
 	private static int getIndexFromByte(byte b) {
 		switch(b) {
 		case 1:
@@ -47,6 +58,10 @@ public class ConsensusVote {
 		int fragmentSize = fragTab[0].size();
 		Fragment consensusFragment = new Fragment(new byte[fragmentSize]);
 		
+		/*
+		 * Each column of cntTab counts the number of times a character (or rather the associated byte) is present in a column of fragTab.
+		 * The correspondence between an column and the associated byte is done with byteFromInt array and getIndexFromByte() method.
+		 */
 		short[] cntTab = new short[4];
 		
 		//For every row, count the number of -2(g), -1(t), 1(a) and 2(c). 0(gaps) are ignored. 
@@ -59,7 +74,7 @@ public class ConsensusVote {
 			
 			consensusFragment.set(j, byteFromInt[maxIndex(cntTab)]);
 			
-			//Reinitialisation de cntTab
+			//cntTab is reinitialized for the next column
 			for (int i=0; i<4; i++)
 				cntTab[i] = 0;
 		}

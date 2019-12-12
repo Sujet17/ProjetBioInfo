@@ -6,12 +6,13 @@ public class Projet {
 	public static final String collectionNumber = "1";
 	public static final Boolean writeOnfile = true;
 	
-	public static final boolean multithreading = true;
+	public static final boolean multithreading = false;
 	
 	public static TimeMonitor timeMonitor;
 	
     public static void main(String args[])
     {	
+    	//testInclusionRelation();
     	if (args.length == 0) {
 
         	timeMonitor = new TimeMonitor();
@@ -66,38 +67,18 @@ public class Projet {
     	*/
     }
 	
-    public void testInclusionRelation() {
+    public static void testInclusionRelation() {
 
-    	Fragment f = new Fragment("aaa");
-    	Fragment g = new Fragment("ggaaaggg");
-    	Fragment h = new Fragment("tgggagggga");
+    	Fragment f = new Fragment("acaatgatc");
+    	Fragment g = new Fragment("caagatcagga");
+    	Fragment h = new Fragment("agagtcaggacc");
     	
-    	SemiGlobalAlignment sga1 = new SemiGlobalAlignment(f, g);
-    	SemiGlobalAlignment sga2 = new SemiGlobalAlignment(f, g.getComplementary());
+    	SemiGlobalAlignment sga1 = new SemiGlobalAlignment(g, h);
     	
-    	System.out.println(sga1.getScoreFG());
-    	System.out.println(sga1.getScoreGF());
+    	System.out.println("score = "+sga1.getScoreFG());
     	
-    	System.out.println(sga2.getScoreFG());
-    	System.out.println(sga2.getScoreGF());
-    	
-    	SemiGlobalAlignment sga3 = new SemiGlobalAlignment(g, h);
-    	SemiGlobalAlignment sga4 = new SemiGlobalAlignment(g, h.getComplementary());
-    	
-    	System.out.println(sga3.getScoreFG());
-    	System.out.println(sga3.getScoreGF());
-    	
-    	System.out.println(sga4.getScoreFG());
-    	System.out.println(sga4.getScoreGF());
-    	
-    	sga3 = new SemiGlobalAlignment(f, h);
-    	sga4 = new SemiGlobalAlignment(f, h.getComplementary());
-    	
-    	System.out.println(sga3.getScoreFG());
-    	System.out.println(sga3.getScoreGF());
-    	
-    	System.out.println(sga4.getScoreFG());
-    	System.out.println(sga4.getScoreGF());
-
+    	System.out.println(sga1);
+    	System.out.println(sga1.retrieveWordsAligned().f);
+    	System.out.println(sga1.retrieveWordsAligned().g);
     }
 }

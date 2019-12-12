@@ -4,7 +4,11 @@ import java.util.Iterator;
 
 public class Fragment {
 	
+	/**
+	 * The byte array that contains the bytes characterizing this fragment
+	 */
 	private byte[] list;
+	
 	
 	public Fragment(String s) {
 		list  = new byte[s.length()];
@@ -25,10 +29,9 @@ public class Fragment {
 	
 	/**
 	 * Convert char into byte
-	 * 
-	 * @param c, char to convert
+	 * @param c the char to convert
 	 * @return byte from 0 to 4, corresponding to the giver char
-	 * 	 */
+	 */
 	public static byte byteFromChar(char c) {
 		switch(c) {
 		case '-':
@@ -49,7 +52,7 @@ public class Fragment {
 	/**
 	 * Convert byte into char
 	 * @param b the byte to convert
-	 * @return 'a' if byte is 0, 'c' if byte is 1, 't' if byte is 2, 'g' if byte is 3, '-' if byte is 4
+	 * @return 'a' if byte is 1, 'c' if byte is 2, 't' if byte is -1, 'g' if byte is -2, '-' if byte is 0
 	 */
 	public static char charFromByte(byte b) {
 		switch(b) {
@@ -69,6 +72,7 @@ public class Fragment {
 	}
 	
 	/**
+	 * 
 	 * @return the complementary-reversed fragment
 	 */
 	public Fragment getComplementary() {
@@ -76,20 +80,17 @@ public class Fragment {
 		byte[] compl = new byte[length];
 		for (int i=0; i<length; i++) 
 			compl[length-i-1] = Fragment.complementaryByte(list[i]);
-		
 		return new Fragment(compl);
 	}
 	
 	/**
-	 * 
 	 * @param b a byte 
-	 * @return complementary of b
+	 * @return the complementary byte of b
 	 */
 	public static byte complementaryByte(byte b) {
 		return (byte)-b;
 	}
 	
-
 	public void set(int index, byte b) {
 		list[index] = b;
 	}

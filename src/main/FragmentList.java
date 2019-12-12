@@ -16,9 +16,9 @@ public class FragmentList extends ArrayList<Fragment> {
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * read the given file and convert data into fragment 
-	 * @param filename, the filepath to file to read
-	 * @return the arrayList of the fragments readed in the file
+	 * Read the given file and convert data into fragment 
+	 * @param filename, the filepath to the file to read
+	 * @return the arrayList of the fragments read in the file
 	 */
 	public static FragmentList getFragmentsFromFile(String filename) {
 		FragmentList fragments = new FragmentList();
@@ -49,10 +49,16 @@ public class FragmentList extends ArrayList<Fragment> {
 		return fragments;
 	}
 	
-	public static void writeToFile(Fragment f, String collectionNum, String filename) {
+	/**
+	 * Write a fragment to a file
+	 * @param f the fragment to write
+	 * @param collectionName the name that identifies the collection
+	 * @param filename the path to the file to write
+	 */
+	public static void writeToFile(Fragment f, String collectionName, String filename) {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-			writer.write("> Groupe-4 Collection "+collectionNum);
+			writer.write("> Groupe-4 Collection "+collectionName);
 			writer.write(" Longueur "+Integer.toString(f.size()));
 			writer.newLine();
 			int i = 0;

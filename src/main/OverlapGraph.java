@@ -53,7 +53,7 @@ public class OverlapGraph {
 	public OverlapGraph(int size) {
 		included = new Vector<Integer>(size);
 		for (int i=0; i<size; i++)
-			included.set(i, -1);
+			included.add(-1);
 	}
 	
 	/**
