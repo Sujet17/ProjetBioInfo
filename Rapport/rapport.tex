@@ -96,11 +96,28 @@ L'alignement semi-global entre deux fragments est utilisé pour construire l'\te
 
 C'est aussi à cette étape que sont détectées les inclusions entre fragments.
 
-Pour calculer cet alignement semi-global, on utilise la programmation dynamique.
+\textcolor{red}{
+L'arc $f \to g$ dans l'\textit{overlap graph} aura pour poids le score de l'alignement semi-global dans lequel $f$ finit par des gaps et $g$ commence par des gaps lorsqu'ils sont alignés.}
 
+L'alignement semi-global optimal est calculé par programmation dynamique. 
+Le score de l'alignement entre deux fragments $f$ et $g$ est défini d'après les scores de l'alignement entre $f*$ et $g*$, où ces derniers sont les préfixes de taille $n-1$ respectifs de $f$ et $g$, i.e., $f*$ est $f$ sans son dernier caractère et similairement pour $g*$ et $g$.
+La relation est la suivante:
+$$score(f, g) = 
+ \left\{
+    \begin{array}{ll}
+        score(f,g*)+gapPenalty \\
+        score(f*,g*)+matchScore(f_{last}, g_{last})\\
+        score(f*,g)+gapPenalty
+    \end{array}
+\right.$$
+où 
+\begin{itemize}
+\item $gapPenalty$ est la pénalité de score liée à l'insertion d'un gap. Pour ce projet, cette pénalité vaut -2.
+\item $f_{last}$ et $g_{last}$ sont les derniers caractères de $f$ et $g$.
+\item $matchScore$ une fonction qui retournera le score d'un match si les deux caractères donnés en entrée sont identiques, et le score d'un mismatch sinon. Ces paramètres valent ici respectivement 1 et -1.
+\end{itemize} 
 
-L'arc $f \to g$ dans l'\textit{overlap graph} aura pour poids le score de l'alignement semi-global dans lequel $f$ finit par des gaps et $g$ commence par des gaps lorsqu'ils sont alignés.
-
+\newpage
 Le tableau suivant montre la matrice calculée pour déterminer les alignements $f \to g$ et $g \to f$, avec $f =$ acaatgatc et $g =$ caagatcagga.
 
 \begin{table}[h]

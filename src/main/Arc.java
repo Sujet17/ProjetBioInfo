@@ -68,7 +68,10 @@ public class Arc implements Comparable<Arc> {
 	 * Used to class the arcs by decreasing weight
 	 */
 	public int compareTo(Arc other) {
-		return other.weight - weight;
+		int tieBreakCriter = 0;
+		if (complSource)
+			tieBreakCriter--;
+		return (other.weight - weight)*1000+tieBreakCriter;
 	}
 	
 	@Override
