@@ -1,6 +1,10 @@
 package main;
 
-public class Projet {
+/**
+ * The main class
+ *
+ */
+public class Project {
 	
 	public static final String targetSize = "16320";
 	public static final String collectionNumber = "5";

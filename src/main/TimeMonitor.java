@@ -2,6 +2,11 @@ package main;
 
 import static java.lang.System.nanoTime;
 
+/**
+ * A class designed to measure the execution time of the project.
+ * It has been used during the implementation of the project
+ *
+ */
 public class TimeMonitor {
 	
 	private boolean display;

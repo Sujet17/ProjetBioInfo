@@ -119,8 +119,8 @@ public class SemiGlobalAlignment {
 				score = alignmentMatrix[i][m-1];
 			}
 		}
-		if (alignmentMatrix[n-1][m-1] > score) { //Si on se trouve sur la case en bas a droite
-			MatrixCell nextCase = getNextCase(n-1, m-1);
+		if (alignmentMatrix[n-1][m-1] > score) { //Specific case for bottom right cell
+			MatrixCell nextCase = getNextCell(n-1, m-1);
 			if (nextCase.line != n-2 || nextCase.column != m-1)
 				iMax = n-1;
 		}
@@ -141,8 +141,8 @@ public class SemiGlobalAlignment {
 				score = alignmentMatrix[n-1][i];
 			}
 		}
-		if (alignmentMatrix[n-1][m-1] > score) { //Si on se trouve sur la case en bas a droite
-			MatrixCell nextCase = getNextCase(n-1, m-1);
+		if (alignmentMatrix[n-1][m-1] > score) { //Specific case for bottom right cell
+			MatrixCell nextCase = getNextCell(n-1, m-1);
 			if (nextCase.line != n-1 || nextCase.column != m-2)
 				iMax = m-1;
 		}
@@ -222,7 +222,7 @@ public class SemiGlobalAlignment {
 		MatrixCell nextCell = new MatrixCell(startCell.line, startCell.column);
 
 		while (nextCell.line>=1 && nextCell.column>=1) 
-			nextCell = getNextCase(nextCell.line, nextCell.column);
+			nextCell = getNextCell(nextCell.line, nextCell.column);
 		
 		return nextCell;
 	}
@@ -235,18 +235,18 @@ public class SemiGlobalAlignment {
 	 * @return
 	 */
 	private MatrixCell buildAlignment(MatrixCell startCase, FragmentBuilder fAligned, FragmentBuilder gAligned) {
-		MatrixCell nextCase = new MatrixCell(startCase.line, startCase.column);
+		MatrixCell nextCell = new MatrixCell(startCase.line, startCase.column);
 		int x, y;
 		
-		while (nextCase.line>=1 && nextCase.column>=1) {
-			x = nextCase.line;
-			y = nextCase.column;
+		while (nextCell.line>=1 && nextCell.column>=1) {
+			x = nextCell.line;
+			y = nextCell.column;
 
 			addNextByte(x, y, fAligned, gAligned);
-			nextCase = getNextCase(nextCase.line, nextCase.column);
+			nextCell = getNextCell(nextCell.line, nextCell.column);
 		}
 		
-		return nextCase;
+		return nextCell;
 	}
 	
 	/**
@@ -272,12 +272,12 @@ public class SemiGlobalAlignment {
 	}
 	
 	/**
-	 * Determines if the score in a specified case of the matrix comes from the above, the left or the top-left case and return this case.
-	 * @param x the line of the matrix case
-	 * @param y the column of the matrix case
-	 * @return the matrix case from which comes the one given as input
+	 * Determines if the score in a specified case of the matrix comes from the above, the left or the top-left cell and return this cell.
+	 * @param x the line of the matrix cell
+	 * @param y the column of the matrix cell
+	 * @return the matrix cell from which comes the one given as input
 	 */
-	private MatrixCell getNextCase(int x, int y) {
+	private MatrixCell getNextCell(int x, int y) {
 		int i = x;
 		int j = y;
 		

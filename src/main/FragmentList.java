@@ -8,11 +8,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * This class is used to store an arrayList of fragments.
+ * It is also used for reading and writing files with data. 
+ *
+ */
 public class FragmentList extends ArrayList<Fragment> {
 	
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 	
 	/**

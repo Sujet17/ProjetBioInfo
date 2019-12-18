@@ -27,7 +27,7 @@ public class UnionFind {
 	}
 	
 	/**
-	 * Used to identify the sets to which belongs the given node
+	 * Used to identify the set in which belongs the given node
 	 * @param node
 	 * @return
 	 */

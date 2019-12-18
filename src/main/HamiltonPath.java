@@ -2,13 +2,16 @@ package main;
 
 import java.util.HashMap;
 
+/**
+ * This class store hasmap that contains associates the source of an arc with this arc.
+ *
+ */
+
 public class HamiltonPath extends HashMap<Integer, Arc> {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
+	// sum of weight of all arcs
 	public int totalWeight;
 	
 	/**
