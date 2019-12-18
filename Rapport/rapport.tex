@@ -8,12 +8,10 @@
 \usepackage{fancyhdr}
 \usepackage{colortbl}
 \usepackage{xcolor}
-%\usepackage{lscape}
-%\usepackage[absolute]{textpos}
-%\usepackage{amssymb}
+
+\usepackage{moreverb}
 
 \definecolor{lightgreen}{rgb}{.5,1,.5}
-
 \definecolor{lightred}{rgb}{1,.5,.5}
 
 \title{
@@ -46,7 +44,7 @@ Faculté des Sciences, Université de Mons}
 \hspace{1cm} &
 \includegraphics[height=1.5cm]{logofs.jpg}
 \end{tabular}
-\end{center}~\\
+\end{center}
 
 
 
@@ -68,15 +66,16 @@ Les fragments reçus en entrée sont des chaînes des caractères (dont la longu
 
 \section{Organisation du travail}
 
-Cette section traite des différents outils utilisés pour réaliser ce projet, de la répartition des tâches au sein du groupe ainsi que 
+\textcolor{red}{
+Cette section traite des différents outils utilisés pour réaliser ce projet et de la répartition des tâches au sein du groupe.}
 
-Ce projet est implémenté sous \textit{java 11}. 
+Les différentes étapes du projet ont été implémentées dans l'ordre dans lequel elles sont présentées dans la section suivante. 
+L'implémentation d'une étape ne commençait qu'une fois l'étape précédente terminée et testée. Plutôt que d'assigner à chaque membre du groupe des parties entières du travail, nous travaillions simultanément sur les mêmes parties du projet. En conséquence, il est impossible de mettre en évidence une répartition claire des tâches. Cette approche nous a permis de nous concentrer successivement sur chacune des parties du projet. S'il fallait changer quelque chose à une étape précédente, les tests unitaires nous permettaient de vérifier que les changements ne corrompent pas le programme. \textcolor{red}{ De plus, avoir tous deux connaissance de l'implémentation précise des autres parties du projet permet de m}
 
-Plutôt que d'assigner à chaque membre du groupe des parties entières du travail, nous avons choisi de travailler simultanément sur les mêmes parties du projet. 
 
-Ce travail a été réalisé en plusieurs semaines. La quantité de travail à accomplir nous a poussé à avoir recours au logiciel $Git$ afin de pouvoir travailler à distance. De nombreuses séances de travail à l'université ont également été organisées. La totalité des étapes du travail, allant de la réflexion à l'implémentation ont été accomplies en duo.
 
-Malgré un retard marqué par une première séance de mise au point peu développée, nous avons pu progresser à grande vitesse pour pouvoir organiser un seconde mise au point et ainsi nous mettre à jour par rapport au temps restant.
+L'outil $git$ a été utilisé pour le contrôle de version.\textcolor{red}{, et le projet a été implémenté sous \textit{java 11}.}
+
 
 \newpage
 
@@ -89,7 +88,7 @@ Ensuite vient la construction d'un chemin hamiltonien sur ce graphe par un algor
 L'avant dernière étape consiste à aligner tous les fragments selon l'ordre obtenu dans le chemin hamiltonien en ajoutant des gaps si nécessaire. On parle de propagation des gaps.
 Finalement intervient le vote de consensus qui, d'après l'ensemble de fragments alignés obtenus après la propagation des gaps, déterminera la séquence finale que retournera le programme.
 
-Les sections suivantes sont consacrées à une explication plus approfondie de chacune de ces étapes clés, chacune décrivant d'abord précisément dans le rôle de l'étape avant de s'attarder sur les choix d'implémentation propres à notre projet.
+Les sections suivantes sont consacrées à une explication plus approfondie de chacune de ces étapes clés, chacune décrivant d'abord précisément le rôle de l'étape avant de s'attarder sur les choix d'implémentation propres à notre projet.
 
 \subsection{Alignement semi-global}
 
@@ -97,10 +96,10 @@ L'alignement semi-global entre deux fragments est utilisé pour construire l'\te
 
 C'est aussi à cette étape que sont détectées les inclusions entre fragments.
 
-L'arc $f \to g$ dans l'\textit{overlap graph} aura pour poids le score de l'alignement semi-global dans lequel $f$ finit par des gaps et $g$ commence par des gaps lorsqu'ils sont alignés.
-
-
 Pour calculer cet alignement semi-global, on utilise la programmation dynamique.
+
+
+L'arc $f \to g$ dans l'\textit{overlap graph} aura pour poids le score de l'alignement semi-global dans lequel $f$ finit par des gaps et $g$ commence par des gaps lorsqu'ils sont alignés.
 
 Le tableau suivant montre la matrice calculée pour déterminer les alignements $f \to g$ et $g \to f$, avec $f =$ acaatgatc et $g =$ caagatcagga.
 
@@ -133,17 +132,27 @@ Le tableau suivant montre la matrice calculée pour déterminer les alignements 
 	\end{tabular}
 \end{table}
 
-$g \to f$
-\begin{verbatim}
-caagatcagga--------
-----------acaatgatc
-\end{verbatim}
+\textcolor{red}{L'alignement est reconstruit de la droite vers la gauche.}
+
+La reconstitution de l'alignement $f \to g$ est mise en évidence en rouge dans le tableau. Pour trouver l'alignement $f \to g$, on  commence depuis la case de score maximal dans la dernière ligne. 
+Partant de cette case, on va remonter le chemin vers la case $(0,0)$. Il s'agit, itérativement, de retrouver la case dont on vient parmi la case située à gauche, la case située au dessus et la case supérieure gauche.
+
+
 
 $f \to g$
 \begin{verbatim}
 acaatgatc----
 -caa-gatcagga
 \end{verbatim}
+En partant de la i\up{e} case de la dernière ligne, on sait qu'on va aligner le dernier caractère de $f$ avec le i\up{e} caractère de $g$. 
+
+L'alignement $g \to f$ est construit en suivant les mêmes règles, mais en partant de la case de score maximal de la dernière colonne. Il est mis en évidence en vert dans le tableau.
+$g \to f$
+\begin{verbatim}
+caagatcagga--------
+----------acaatgatc
+\end{verbatim}
+
 
 \subsection{Overlap graph}
 
@@ -185,26 +194,71 @@ Concernant nos choix d'implémentation, nous
 
 \subsection{Propagation des gaps}
 
-L'étape de propagation des gaps consiste à aligner les différents fragments du chemin hamiltonien construit à l'étape précédente.
-\textcolor{red}{
-Cette étape consiste à transformer le chemin hamiltonien construit à l'étape précédente en un ensemble de fragments alignés. Pour la suite, nous appellerons consécutifs deux arcs du chemin tels que la destination du premier est la source du second.}
+L'étape de propagation des gaps consiste à aligner les différents fragments selon le chemin hamiltonien construit à l'étape précédente. Cette étape consiste donc à transformer l'ensemble d'arcs du chemin en un ensemble de fragments alignés. 
 
-Pour réaliser cet alignement de nombreux fragments, il faut, pour chaque paire d'arcs consécutifs du chemin hamiltonien (i.e., chaque paire d'arcs $f \to g$ et $g \to h$), aligner le $g$ obtenu dans l'alignement $f \to g$ avec le $g$ obtenu dans l'alignement $g \to h$, en propageant vers le haut et vers le bas tous les gaps nécessaires.
-
-\textcolor{red}{
-La propagation des gaps consiste donc à aligner les paires consécutives, et à propager vers toutes les paires précédentes et suivantes les gaps induits par cet alignement.}
+Pour réaliser cet alignement de nombreux fragments, il faut, pour chaque paire d'arcs consécutifs du chemin hamiltonien (i.e., chaque paire d'arcs $f \to g$ et $g \to h$), \textcolor{red}{aligner} le $g$ obtenu dans l'alignement $f \to g$ avec le $g$ obtenu dans l'alignement $g \to h$. A chaque fois qu'un gap est inséré dans le $g$ de l'arc $f \to g$, il faut l'insérer dans tous les fragments précédant $g$ dans le chemin. Similairement, lorsqu'un gap est ajouté dans le $g$ de l'arc $g \to h$, il faut le propager dans tous les fragments suivants $g$ dans le chemin hamiltonien. 
 
 Pour illustrer, prenons les fragments $f =$ acaatgatc, $g =$ caagatcagga et $h =$ agagtcaggacc et considérons le chemin hamiltonien $f \to g \to h$.
 
+Voici l'alignement correspond à l'arc $f \to g$ :  
+\begin{boxedverbatim}
+acaatgatc----
+-caa-gatcagga
+\end{boxedverbatim}.
 
-\begin{verbatim}
+Et celui correspondant à l'alignement $g \to f$ :  
+\begin{boxedverbatim}
 caaga-tcagga--
 --agagtcaggacc
-\end{verbatim}
+\end{boxedverbatim}.
 
-A chaque arc correspond un alignement semi-global entre les deux fragments qui sont les extrémités de cet arc.
-Pour chaque paire d'arcs consécutifs du chemin, il faut donc aligner le $g$ obtenu depuis l'arc $f \to g$ avec le g obtenu depuis l'arc $g \to h$.
+L'alignement $f \to g \to h$ obtenu après la propagation des gaps est celui-ci : 
 
+\begin{boxedverbatim}
+acaatga-tc------
+-caa-ga-tcagga--
+---a-gagtcaggacc
+\end{boxedverbatim}.
+
+Le but est donc de faire correspondre le $g$ du premier arc avec le $g$ du second en ajoutant les gaps nécessaires, tout en propageant ces gaps vers le haut ou vers le bas. On peut par exemple voir un gap ajouté à la 5\up{e} ligne et propagé vers le haut, ou encore un gap ajouté à la 8\up{e} ligne, propagé vers le bas.
+
+En résumé, la propagation des gaps consiste à parcourir successivement les arcs du chemin, et pour chaque couple d'arcs successifs
+$f \to g$ et $g \to h$, parcourir les deux $g$ obtenus de la gauche vers la droite en ajoutant des gaps en haut ou en bas dans le but d'aligner complètement ces deux $g$. Tous les gaps ajoutés sont propagés respectivement vers le haut ou le bas. Une fois que les $g$ sont complètement alignés, on passe à l'arc suivant.
+\\~\\
+
+
+Ici vont être abordées les spécificités propres à notre implémentation. La première question qui s'est posée au moment d'implémenter la propagation des gaps était relative à la structure de données utilisée pour stocker l'ensemble d'arcs utilisés par le chemin hamiltonien. 
+L'algorithme glouton utilisé pour construire le chemin nous donne les arcs par ordre de poids décroissants, et donc pas dans l'ordre qui correspondrait à un parcours de ce chemin. Pour avoir les arcs dans cet ordre et ainsi pouvoir aligner deux à deux les arcs consécutifs, il faut trier les arcs du chemin.
+
+\textcolor{red}{
+Or pour réaliser l'alignement de tous les fragments consiste  il faut aligner tous les arcs consécutifs. Cela signifie qu'il faut, à partir d'un arc, pouvoir trouver facilement l'arc suivant (ou précédent) dans le chemin hamiltonien. Autrement}
+
+Pour effectuer ce tri, trois solutions ont été envisagées :
+\begin{itemize}
+\item utiliser un arbre de recherche équilibré (\textit{TreeSet}\footnote{https://docs.oracle.com/javase/7/docs/api/java/util/TreeSet.html} de java). Cette structure garantit l'insertion et la recherche d'un élément en en $O(log(n))$. L'idée est de stocker les arcs dans l'arbre en les triant en fonction de leur source. Ainsi, une fois qu'on a trouvé le premier arc du chemin, on peut trouver les $n-1$ suivants en $O(n(log(n))$.
+
+\item utiliser une table de hachage (\textit{HashMap}\footnote{\label{note1}https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html} de java) permettant de retrouver un arc en fonction de sa source. En utilisant une table de hachage ayant pour clés les sources des arcs et comme valeurs les arc, retrouver un arc en fonction de sa source se fait avec une complexité moyenne en $O(1)$ (bien qu'aucune garantie ne soit donnée d'avoir cette complexité pour un pire cas). Avec cette solution, trouver les $n-1$ derniers arcs du chemin se fait en moyenne en $O(n(log(n))$.
+
+\item utiliser une table de hachage permettant de retrouver un arc en fonction de sa destination ou de sa source. Ici, l'idée est d'ajouter deux entrées dans la table pour chaque arc : une entrée associant cet arc à sa source et l'autre à sa destination. Les clés sont donc des objets constitués soit de la source et d'un booléen valant $true$, soit de la destination et d'un booléen valant $false$. Les booléens permettent de distinguer les clés qui correspondent aux sources et les clés qui correspondent aux destinations. Les valeurs sont les arcs. Cette solution permet de ne pas avoir à trouver le premier arc du chemin, puisqu'il est possible, partant d'un arc quelconque, de retrouver aussi bien l'arc suivant que l'arc précédent en $O(1)$ (en moyenne). Ainsi, il suffit de choisir un arc quelconque et trouver les $n-1$ autres arcs se fait en moyenne en $O(n(log(n))$.
+\end{itemize}
+
+C'est finalement la deuxième solution qui a été implémentée. D'après sa complexité, la première a été rapidement écartée (le pire cas des tables de hachage étant évitable grâce à un bon choix de la fonction de hachage et de la taille de la table). 
+La troisième solution a comme avantage sur la deuxième de permettre de commencer à partir d'un fragment quelconque. Par contre, elle nécessite une table occupant deux fois plus d'espace et elle rend plus complexe l'implémentation. La difficulté supplémentaire d'implémentation est liée au fait que si les arcs sont traités en partant du premier, propager les gaps vers le bas revient à insérer des gaps dans un seul fragment, alors que traiter les arcs en suivant le chemin à l'envers implique de pouvoir propager les gaps vers le bas sur plusieurs fragments.
+
+En itérant sur la liste des clés de la table qui contient le chemin, et en comparant chacune de ces clés avec l'entrée correspondante dans le tableau \textit{in} utilisé pour l'algorithme glouton, on peut trouver le premier arc du chemin en $O(n+m)$ (où $n$ est le nombre d'arcs et $m$ est la capacité de la \textit{HashMap}\footnote{\textcolor{red}{Voir la documentation java}}). En effet, la source du premier chemin est le seul nœud qui n'est pas une destination d'un arc du chemin, et donc le seul pour lequel l'entrée du tableau \textit{in} vaudra $0$. Puisque 
+
+Au vu du peu de temps nécessaire pour trouver le premier fragment, et tenant compte des autres avantages et défauts des deuxièmes et troisièmes solutions, nous avons choisi d'implémenter la deuxième.
+\\~\\ 
+ 
+Après avoir choisi le moyen de trier nos arcs, s'est posé le problème du choix de la structure utilisée pour stocker les fragments en train d'être alignés. Pour cela, il faut une structure permettant facilement l'insertion d'un caractère à un indice donné. Les \textit{LinkedList}\footnote{https://docs.oracle.com/javase/7/docs/api/java/util/LinkedList.html} de java, qui sont des listes doublement chaînées, ont été choisies. Dans une première implémentation, naïve, une \textit{LinkedList} était utilisée pour stocker l'ensemble des caractères des fragments alignés. 
+Le problème de cette implémentation est qu'elle s'est avérée extrêmement peu efficace (plus d'une demi-heure sur la plus grande collection de fragments). 
+
+\textcolor{red}{
+Ainsi, lorsqu'un gap devait être propagé vers le haut, il devait être inséré dans les $k$ \textit{LinkedList} correspondants aux $k$ fragments déjà traités. Et lorsqu'un gap devait être propagé vers le bas, il fallait l'insérer dans le fragment en train d'être traité.}
+
+Afin d'améliorer cette première implémentation, plusieurs modifications ont été apportées.
+
+La première d'entre elles, et la plus importante en termes d'impact sur la complexité, est la modification de la structure utilisée pour stocker les fragments en cours d'alignement (classe \textit{FragmentBuilder}). Plutôt que d'utiliser une liste chaînée pour stocker l'ensemble des caractères de chaque \textit{FragmentBuilder}, nous avons décidé d'utiliser une structure constituée de deux entiers et d'une liste chaînée. Pour illustrer les motivations ayant amené ce changement, voyons cet exemple nous montrant un alignement de 7 fragments.
 
 \begin{verbatim}
 tccgaagtctgct----------------------------------
@@ -216,45 +270,38 @@ tccgaagtctgct----------------------------------
 -----------------------------------gggggggtcggt
 \end{verbatim}
 
+On constate que la majorité des caractères que chacun de ces fragments sont des gaps situés à la fin ou au début du mot. Plus l'exemple est grand, plus la proportion de gaps est importante. Pour le plus grand exemple, tous les mots alignés comptent environ $100000$ caractères, alors que chacun d'entre eux provient d'un fragment qui compte en $500$ et $700$ caractères. Sur les $100000$ caractères, on a donc énormément de gaps situés avant ou après une zone d'environ $700$ caractères. L'idée est d'éviter d'utiliser $n$ nœuds de \textit{LinkedList} (un Byte dans chaque nœud) pour stocker tous ces gaps.
+Chaque \textit{FragmentBuilder} a donc deux entiers \textit{startGaps} et \textit{endGaps} qui stockent respectivement le nombre de gaps situés au début et à la fin du mot. Pour stocker les caractères situés entre ces gaps, une \textit{LinkedList} est toujours utilisée. Ce changement permet d'économiser de la mémoire en utilisant seulement deux entiers là où étaient nécessaires jusqu'à plus de $99000$ nœuds de \textit{LinkedList} auparavant. 
+\textcolor{red}{Ce changement permet aussi d'ajouter des gaps simplement en incrémentant un entier plutôt qu'en ajoutant un noeud}
 
-Ici vont être abordées les spécificités propres à notre implémentation. La première question qui s'est posée au moment d'implémenter la propagation des gaps était relative à la structure de données utilisée pour stocker l'ensemble d'arcs utilisés par le chemin hamiltonien. 
-Pour réaliser l'alignement de tous les fragments, il faut aligner tous les arcs consécutifs. Cela signifie qu'il faut pouvoir trouver facilement l'arc suivant (ou précédent) dans le chemin hamiltonien.
+Une autre amélioration est l'utilisation de \textit{ListIterator} pour itérer sur les listes chaînées en $O(n)$. En effet atteindre le $i^e$ d'une liste chaînée demande de parcourir les $i-1$ éléments précédents (éventuellement moins dans le cas d'une liste non chaînée, mais la complexité reste inchangée). Atteindre le $i^e$ élément de la liste pour $i$ allant de 1 à $n$ donne donc une complexité du parcours en $0(n^2)$.
 
-Trois solutions ont été envisagées pour avoir un accès rapide au fragment voulu dans le chemin hamiltonien.
-\begin{itemize}
-\item Utiliser un arbre de recherche équilibré 
-\item Utiliser une table de hachage permettant de retrouver un arc en fonction de sa destination ou de sa source
-\item Utiliser une table de hachage permettant de retrouver un arc en fonction de sa source
-\end{itemize}
+Le dernier changement notable est simplement l'exploitation du fait que pour deux fragments alignés $f$ et $g$, avoir $f$ situé avant $g$ dans le chemin hamiltonien (et donc $f$ situé plus haut que $g$ dans le tableau de fragments alignés) implique que \textit{endGaps}$(f) > $  \textit{endGaps}$(g)$. Ceci signifie que lorsqu'un gap est inséré à un indice se trouvant dans la zone des gaps de fin dans un fragment du tableau, alors cet indice se trouvera aussi dans la zone des gaps de fin pour tous les fragments situés plus haut dans le tableau. 
 
-Pour classer les fragments, d'abord pensé aux abr équilibrés (\textit{TreeSet}\footnote{https://docs.oracle.com/javase/7/docs/api/java/util/TreeSet.html} de java), et puis hashmap
 
-Pour stocker ces fragments en construction, il faut une structure permettant facilement l'insertion d'un caractère à un indice donné. Les \textit{LinkedList}\footnote{https://docs.oracle.com/javase/7/docs/api/java/util/LinkedList.html} de java, qui sont des listes doublement chaînées, ont été choisies. Dans une première implémentation, naïve, une liste chaînée était utilisée pour stocker l'ensemble des caractères des fragments alignés. Ainsi, lorsqu'un gap devait être propagé vers le haut, il devait être inséré dans les $k$ fragments déjà traités. Et lorsqu'un gap devait être propagé vers le bas, 
+\textcolor{red}{, lors de la comparaison des deux $g_i$ des arcs $f \to g_1$ et $ g_2 \to h$, d'ajouter directement \textit{startGaps}$(g_1)$ gaps au début de $g_2$ et de comparer ensuite les deux mots caractère par caractère pour le reste du mot.}
 
-Le problème de cette implémentation est qu'elle rendait très longue l'étape de propagation des gaps (plus d'une demi-heure sur la plus grande collection de fragments à disposition). 
-
-Parmi les raisons provoquant un tel délai, nous avons d'abord pensé à :
-- l'accès en O(index) dans les listes chainées (mais utiliser iterator n'a pas résolu problème)
-- Devoir ajouter un nombre très important de gaps derrière fragments du début et devant ceux de la fin. En effet, si les fragments ont une taille allant de 500 à 700 caractères, leur version alignée dans cette étape a une taille proche de celle de la séquence cible (environ $100.000$ caractères pour la plus grande collection). Cela signifie que l'on passait énormément de temps à ajouter des gaps devant et derrière ces chaînes, sans plus toucher à l'information consistance rassemblée sur 500 à 700 caractères parmi les $100.000$.
-Nous étant rendus compte que les fragments en construction étaient constitués essentiellement de gaps (plus précisément d'un grand nombre de gaps suivis de 500 à 700 caractères, eux-mêmes suivis d'un grand nombre de gaps), nous avons décidé d'adapter la structure de ces \textit{FragmentBuilder} pour consommer moins d'espace et permettre des opérations plus rapides.
-
-Expliquer la structure des fragmentsBuider + gain de temps
-
-+ Petite optimisation : arrêter de propager les gaps vers le haut quand on sait qu'ils seront après la zone d'information consistante
+Avec toutes ces modifications, l'étape de propagation se fait en $O(n*m)$, où $n$ est la taille du chemin hamiltonien et $m$ la taille maximale d'un fragment. En effet, on traite les $n$ fragments du chemin, et pour chacun d'eux on parcourt (en temps linéaire) uniquement la zone située entre les gaps du début et les gaps de fin. Dans la version précédente, ajouter un nouveau mot demandait d'ajouter un par un les $n$ gaps du début, et de propager sur tous les fragments déjà traités les gaps de fin. Si pour les petites instances le gain de temps n'a pas été déterminant - bien que non négligeable -, les changements ont permis de réduire le temps de propagation des gaps de plus d'une demi-heure à moins d'une demi-seconde.
 
 
 \subsection{Vote de consensus}
 
-Dernière de l'assemblage, le vote de consensus est l'étape où est construit le fragment qui sera donné en sortie. Il s'agit de retourner un fragment tel que son $i^{eme}$ caractère est le caractère le plus présent dans la $i^{eme}$ colonne du tableau construit pendant lors de la propagation des gaps.
+Dernière de l'assemblage, le vote de consensus est l'étape où est construit le fragment qui sera donné en sortie. Il s'agit de retourner un fragment tel que son $i^e$ caractère est le caractère le plus présent dans la $i^e$ colonne du tableau construit pendant lors de la propagation des gaps.
 
 Pour cette étape, notre implémentation consiste simplement à compter, pour chaque colonne, le nombre d’occurrences de chaque caractère (en ignorant les gaps) et à placer ensuite ce caractère au bon indice dans la séquence résultat.
+Pour éviter d'utiliser inutilement de la mémoire en instanciant des tableaux de caractères, nous avons choisi de conserver des \textit{FragmentBuilder} pour cette étape. Pour conserver l'accès en temps constant à un élément, des \textit{Iterator} sont utilisés pour parcourir les \textit{LinkedList} des différents \textit{FragmentBuilder}.
+
+Une petite optimisation est issue du fait que pour deux fragments alignés $f$ et $g$, avoir $f$ situé plus haut que $g$ dans le tableau \textit{FragmentBuilder} implique que \textit{startGaps}$(f) < $  \textit{startGaps}$(g)$ et \textit{endGaps}$(f) > $  \textit{endGaps}$(g)$. La première implication signifie que pour une colonne donnée, on peut s'arrêter de descendre dès qu'on arrive dans les gaps du début d'un mot, puisque chacun des mots situés plus bas aura un gap dans à cet indice. Similairement, la seconde implication permet de commencer à la ligne $j$ pour une colonne $i$ si l'indice $i-1$ se trouve dans la zone des gaps de fin de la $j^e$ ligne. 
+
+ lorsqu'un gap est inséré à un indice se trouvant dans la zone des gaps de fin dans un fragment du tableau, alors cet indice se trouvera aussi dans la zone des gaps de fin pour tous les fragments situés plus haut dans le tableau. 
+
 En cas d'égalité entre deux caractères, le caractère résultant est choisi selon l'ordre arbitraire suivant (ici classés par ordre de préférence décroissante) : a, t, c, g.
 
 \section{Qualité du projet}
 
 Nous avons eu recours aux streams pour la construction des arcs du graphe. Le multithreading est la capacité à pouvoir effectuer plusieurs taches ($threads$) simultanément. Le principal avantage est le gain de temps très important qu'apporte cette méthode. Cependant, comme les taches sont gérer en même temps , les résultats peuvent ne pas être cohérent. Le problème majeur de cette méthode est le non déterminisme des résultats.
 
-Durant la réalisation du projet une grande quantité de tests ont été implémentés. Cela a permis non seulement de pouvoir détecter rapidement d'éventuelles erreurs, mais également de pouvoir continuer le travail sans avoir de doute quand aux différentes classes et méthodes déja implémentées.
+Les tests unitaires, bien que non-exhaustifs, permettent quasiment d'avoir la certitude du bon fonctionnement de nos méthodes.
 
 
 
