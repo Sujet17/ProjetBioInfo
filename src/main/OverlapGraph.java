@@ -139,7 +139,7 @@ public class OverlapGraph {
 		Arc arc = arcs.poll();
 		while (arc != null) {
 			if (isAvailableArc(struct, arc, in, out)) {
-				System.out.println(arc.getWeight());
+				//System.out.println(arc.getWeight());
 				int f = arc.getSource();
 				int g = arc.getDestination();
 				

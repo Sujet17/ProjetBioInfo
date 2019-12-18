@@ -1,6 +1,8 @@
 Collections/10000/result-ic1.fasta
 Collections/16320/result5.fasta
 Collections/16320/result-ic5.fasta
+Collections/100000/result2.fasta
+Collections/100000/result-ic2.fasta
 
 # Compiled class file
 *.class

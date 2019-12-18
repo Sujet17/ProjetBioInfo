@@ -2,8 +2,8 @@ package main;
 
 public class Projet {
 	
-	public static final String targetSize = "10000";
-	public static final String collectionNumber = "1";
+	public static final String targetSize = "16320";
+	public static final String collectionNumber = "5";
 	public static final Boolean writeOnfile = true;
 	
 	public static final boolean multithreading = false;
@@ -12,7 +12,6 @@ public class Projet {
 	
     public static void main(String args[])
     {	
-    	//testInclusionRelation();
     	if (args.length == 0) {
 
         	timeMonitor = new TimeMonitor();
@@ -28,7 +27,7 @@ public class Projet {
     		
     		GapPropagator gp = new GapPropagator(fl);
     		
-    		Fragment[] t = gp.propagateGaps(path);
+    		FragmentBuilder[] t = gp.propagateGaps(path);
     		
     		timeMonitor.measure("Time to propagate gaps");
     		
@@ -65,20 +64,5 @@ public class Projet {
 
     	}
     	*/
-    }
-	
-    public static void testInclusionRelation() {
-
-    	Fragment f = new Fragment("acaatgatc");
-    	Fragment g = new Fragment("caagatcagga");
-    	Fragment h = new Fragment("agagtcaggacc");
-    	
-    	SemiGlobalAlignment sga1 = new SemiGlobalAlignment(g, h);
-    	
-    	System.out.println("score = "+sga1.getScoreFG());
-    	
-    	System.out.println(sga1);
-    	System.out.println(sga1.retrieveWordsAligned().f);
-    	System.out.println(sga1.retrieveWordsAligned().g);
     }
 }

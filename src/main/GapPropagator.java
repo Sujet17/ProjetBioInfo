@@ -24,7 +24,7 @@ public class GapPropagator {
 	 * @param path the hamilton path on the fragmentList given in the constructor
 	 * @return An array of fragments which contains all the aligned fragments from the hamilton path
 	 */
-	public Fragment[] propagateGaps(HamiltonPath path) {
+	public FragmentBuilder[] propagateGaps(HamiltonPath path) {
 		result = new FragmentBuilder[path.size()+1];
 
 		Arc arc = path.getStart();
@@ -84,15 +84,10 @@ public class GapPropagator {
 		}
 		result[i] = h;		
 		
-		Fragment[] tab = new Fragment[result.length];
-		i = 0;
 		int size = h.size();
-		for (FragmentBuilder fb : result) {
+		for (FragmentBuilder fb : result) 
 			fb.addEndGaps(size-fb.totalSize());
-			tab[i] = new Fragment(fb);
-			i++;
-		}
-		return tab;
+		return result;
 	}
 	
 	private void insertGap(int resultIndex, int gapIndex) {

@@ -1,5 +1,8 @@
 package main;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 /**
  * An non-instantiable class who provides static method to make the consensus vote step
  */
@@ -50,12 +53,17 @@ public class ConsensusVote {
 	
 	/**
 	 * Returns a fragment whose the i-th character is the most represented character in the i-th column of the given array
-	 * @param fragTab An array of aligned fragments (i.e., all of them have the same size)
+	 * @param fbArray An array of aligned fragments (i.e., all of them have the same size)
 	 * @return the "consensus fragment"
 	 */
-	public static Fragment consensusVote(Fragment[] fragTab) {
+	public static Fragment consensusVote(FragmentBuilder[] fbArray) {
+
+		ArrayList<Iterator<Byte>> iterators = new ArrayList<Iterator<Byte>>(fbArray.length);
+		for (FragmentBuilder fb : fbArray) 
+			iterators.add(fb.innerIterator());
 		
-		int fragmentSize = fragTab[0].size();
+
+		int fragmentSize = fbArray[0].totalSize();
 		Fragment consensusFragment = new Fragment(new byte[fragmentSize]);
 		
 		/*
@@ -66,18 +74,26 @@ public class ConsensusVote {
 		
 		//For every row, count the number of -2(g), -1(t), 1(a) and 2(c). 0(gaps) are ignored. 
 		
-		for(int j=0; j<fragmentSize; j++) {
-			for(int i=0; i<fragTab.length; i++) {
-				if (fragTab[i].byteAt(j) != 0)
-					cntTab[getIndexFromByte(fragTab[i].byteAt(j))] ++;
+		
+		int startLine = 0;
+		
+		for (int j=0; j<fragmentSize; j++) {
+			while (startLine<fbArray.length-1 && j>fbArray[startLine].size()-1)
+				startLine++;
+			int i = startLine;
+			while (i<fbArray.length && j>fbArray[i].getStartGaps()-1) {
+				byte b = iterators.get(i).next();		
+				if (b != 0)
+					cntTab[getIndexFromByte(b)] ++;
+				i++;
 			}
-			
+
 			consensusFragment.set(j, byteFromInt[maxIndex(cntTab)]);
 			
 			//cntTab is reinitialized for the next column
-			for (int i=0; i<4; i++)
-				cntTab[i] = 0;
-		}
+			for (int k=0; k<4; k++)
+					cntTab[k] = 0;
+		}		
 		
 		return consensusFragment;
 	}

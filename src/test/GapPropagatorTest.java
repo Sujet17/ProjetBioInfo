@@ -8,6 +8,7 @@ import main.FragmentList;
 import main.HamiltonPath;
 import main.OverlapGraph;
 import main.Fragment;
+import main.FragmentBuilder;
 import main.GapPropagator;
 
 
@@ -32,7 +33,11 @@ public class GapPropagatorTest {
 		
 		
 		GapPropagator gp = new GapPropagator(fl);
-		Fragment[] tab = gp.propagateGaps(path);
+		FragmentBuilder[] fbArray = gp.propagateGaps(path);		
+		
+		Fragment[] tab = new Fragment[fbArray.length];
+		for(int i=0; i<fbArray.length; i++)
+			tab[i] = new Fragment(fbArray[i]);		
 		
 		//printDebug(path, fl, tab);
 		
@@ -46,8 +51,7 @@ public class GapPropagatorTest {
 		
 	}
 	
-	@Test
-	public void test2() {
+	public static FragmentBuilder[] getExample2() {
 		FragmentList fl = new FragmentList();
 		fl.add(new Fragment("cccccacg"));
 		fl.add(new Fragment("acggttaag"));
@@ -68,7 +72,17 @@ public class GapPropagatorTest {
 		path.add(new Arc(5, 6, false, false, 4));
 		
 		GapPropagator gp = new GapPropagator(fl);
-		Fragment[] tab = gp.propagateGaps(path);		
+		FragmentBuilder[] fbArray = gp.propagateGaps(path);		
+		
+		return fbArray;
+	}
+	
+	@Test
+	public void test2() {
+		FragmentBuilder[] fbArray = getExample2();
+		Fragment[] tab = new Fragment[fbArray.length];
+		for(int i=0; i<fbArray.length; i++)
+			tab[i] = new Fragment(fbArray[i]);			
 		
 		//printDebug(path, fl, tab);
 		

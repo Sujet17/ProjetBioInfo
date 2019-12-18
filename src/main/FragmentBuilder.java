@@ -33,6 +33,15 @@ public class FragmentBuilder{
 		innerList = new LinkedList<Byte>();
 	}
 	
+	/*
+	 * Used only for testing
+	 */
+	public FragmentBuilder(Fragment f) {
+		this();
+		for(int i=0; i<f.size(); i++)
+			innerList.add(f.byteAt(i));
+	}
+	
 	/**
 	 * @param index
 	 * @return the byte at the specified index
