@@ -117,10 +117,10 @@ public class OverlapGraphTest {
 		l.setStartNode(3);
 		l.add(new Arc(4, 7, false, false, 6));
 		l.add(new Arc(1, 4, false, false, 4));
-		l.add(new Arc(3, 2, false, false, 4));
+		l.add(new Arc(2, 3, true, true, 4));
 		l.add(new Arc(7, 6, false, true, 4));
 		l.add(new Arc(0, 1, true, false, 3));
-		l.add(new Arc(6, 3, true, false, 1));
+		l.add(new Arc(3, 0, true, true, 1));
 		
 		HamiltonPath path = graph.getHamiltonPath();
 		
