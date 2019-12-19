@@ -35,6 +35,9 @@ public class OverlapGraph {
 		
 		arcs = new PriorityBlockingQueue<Arc>();		
 		
+		/*
+		 * If the multithreading is activated
+		 */
 		if (Project.multithreading)
 			IntStream.range(0, size).forEach(i -> IntStream.range(i+1,  size).parallel().forEach(j -> buildArcs(i, j)));
 			

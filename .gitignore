@@ -50,6 +50,7 @@ out/
 
 # Eclipse : project
 .classpath
+bin
 *.prefs
 
 # LateX

@@ -2,7 +2,6 @@ package main;
 
 /**
  * The main class
- *
  */
 public class Project {
 	
@@ -16,7 +15,7 @@ public class Project {
 	
     public static void main(String args[])
     {	
-    	if (args.length == 0) {
+    	if (args.length < 0) {
 
         	timeMonitor = new TimeMonitor();
 

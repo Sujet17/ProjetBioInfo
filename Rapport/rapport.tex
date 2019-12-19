@@ -118,7 +118,7 @@ où
 \end{itemize} 
 
 \newpage
-Le tableau suivant montre la matrice calculée pour déterminer les alignements $f \to g$ et $g \to f$, avec $f =$ acaatgatc et $g =$ caagatcagga.
+Le tableau suivant montre la matrice calculée pour déterminer les alignements $f \to g$ et $g \to f$, avec $f =$ acaatgatc et $g =$ caagatcagga (choisis arbitrairement).
 
 \begin{table}[h]
 	\centering
@@ -146,15 +146,21 @@ Le tableau suivant montre la matrice calculée pour déterminer les alignements 
 		\hline 
 		C&0 & 1 & -1 & -3 & -2 & -1 & 2 & \cellcolor{lightred}5 & 3 & 1 & -1 & -3  \\
 		\hline 
-	\end{tabular}
+	\end{tabular}	
+	\caption{\textcolor{red}{Table de calcul de l'alignement semi-global avec $f$ = acaatgatc et $g$ = caagatcagga}}
 \end{table}
 
 \textcolor{red}{L'alignement est reconstruit de la droite vers la gauche.}
 
 La reconstitution de l'alignement $f \to g$ est mise en évidence en rouge dans le tableau. Pour trouver l'alignement $f \to g$, on  commence depuis la case de score maximal dans la dernière ligne. 
-Partant de cette case, on va remonter le chemin vers la case $(0,0)$. Il s'agit, itérativement, de retrouver la case dont on vient parmi la case située à gauche, la case située au dessus et la case supérieure gauche.
+Partant de cette case, on va remonter le chemin vers la case $(0,0)$. Il s'agit de retrouver itérativement la case dont on vient parmi la case située à gauche, la case située au dessus et la case supérieure gauche.
 
-
+\textcolor{blue}{
+- Parler de comment on trouve les inclusions\\
+- Dire que les fragments qu'on utilise sont des tableaux de byte\\
+- La matrice de score est une matrice de short\\
+- parler de la complexité en temps et en espace de cette étape
+}
 
 $f \to g$
 \begin{verbatim}
@@ -173,25 +179,45 @@ caagatcagga--------
 
 \subsection{Overlap graph}
 
-La première étape de cet algorithme est la construction de l'overlap graph. Il s'agit de créer un graphe dont les sommets sont les fragments donnés en entrée et leurs complémentaires-inversés. Ce graphe est orienté et pondéré. Un arc $f\to g$ de poids $w$ existe entre $f$ et $g$ si l'alignement semi-global entre $f$ et $g$ est de poids $w$.
+L'\textit{overlap graph} est un graphe orienté et pondéré dont les sommets sont des fragments. Les arcs sont déterminés d'après les alignements semi-globaux. Soit $w$ le score de l'alignement semi-global entre $f$ et $g$, alors l'arc du graphe allant de $f$ à $g$ aura un poids de $w$. Dans notre cas, les fragments données en entrée et leurs complémentaires-inversés sont les sommets du graphe.
 
-Pour construire ce graphe, il faut donc rechercher l'alignement semi-global optimal pour chaque paire de fragments du graphe (excepté les paires constituées d'un fragment et son complémentaire-inversé).
+Pour construire ce graphe, il faut rechercher l'alignement semi-global optimal pour chaque paire de fragments du graphe (excepté les paires constituées d'un fragment et son complémentaire-inversé).
 
-Nous avons pris le parti de retirer du graphe les fragments inclus à d'autres.
+De chaque sommet part un arc vers tous les autres - excepté son complémentaire-inversé. Il y a donc $n*(n-2)$ arcs à calculer - où $n$ est le nombre de sommets du graphe. On a pu voir à la section précédente qu'une seule matrice d'alignement permet de trouver à la fois l'arc $f\to g$ et l'arc $g \to f$. On sait aussi que les arcs $f \to g$ et $g' \to f'$  (avec $f'$ et $g'$ les complémentaires-inversés de $f$ et $g$) ont le même poids. Par conséquent, on peut calculer les poids des 8 arcs entre les sommets $f$, $f'$, $g$ et $g'$ en construisant uniquement deux matrices d'alignement semi-global. Au final $\frac{n*(n-2)}{8}$ matrices devront être construites.
 
-Puisque le graphe est construit dans l'unique but de parcourir les arcs par ordre décroissant pour construire le chemin hamiltonien, nous avons choisi de mettre tous les arcs dans un tas où ils seraient triés en fonction de leur poids.
+\textcolor{red}{
+S'il faut aussi considérer les fragments complémentaires-inversés dans le graphe, c'est parce les fragments issus du séquençage peuvent provenir du brin $3' \to 5'$ ou du brin $5' \to 3'$. Le problème d'assemblage de fragments consiste à reconstituer un seul des deux brins, ce qui demande d'écarter les fragments provenant du mauvais brin. }
 
-\textit{PriorityBlockingQueue}\footnote{https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/PriorityBlockingQueue.html}
+Certains fragments du graphe peuvent être inclus à d'autres. Ceci s'explique par le fait que les fragments peuvent provenir du brin $3' \to 5'$ ou du brin $5' \to 3'$. Prenons le cas de deux fragments $f$ et $g$ provenant chacun d'un brin différent, et correspondant tous deux à la même zone de la double-hélice d'ADN. Alors $f$ sera très similaire à $g'$. Dans ce cas, l'inclusion sera détectée lors de l'alignement semi-global, et le fragment le plus court sera considéré comme inclus à l'autre. 
+Nous avons pris le parti d'écarter du graphe un fragment dès que son inclusion à un autre fragment est détectée - le complémentaire-inversé est lui aussi écarté. C'est une manière non exacte d'écarter les fragments provenant du mauvais brin.
 
-Pour la suite, nous nommerons $f'$ le fragment complémentaire-inversé d'un fragment $g$. 
+Le fait d'écarter les fragments inclus à d'autres a un grand impact sur le temps de calcul du graphe. En effet, pour chacune des collections de fragments, 80\% des fragments s'avéraient être inclus à d'autre. Cela réduit d'un facteur 5 le nombre de sommets du graphe et donc d'un facteur 25 le nombre d'arcs à calculer. En réalité, le gain n'est pas aussi important puisque les inclusions ne sont pas connues à l'avance, ce qui fait que certains arcs seront construits vers et depuis des fragments inclus. Néanmoins, une fois que l'inclusion a été détectée, plus aucun arc ne sera construit vers ou depuis le fragment concerné. Quant aux arcs construits inutilement, ils seront simplement ignorés.
 
-Chaque nœud d'un graphe contient un fragment $f$ et son complémentaire-inversé $f'$. Ce choix est expliqué dans la section suivante.
+Puisque le graphe est construit dans l'unique but de parcourir les arcs par ordre décroissant pour construire le chemin hamiltonien, nous avons choisi de mettre tous les arcs dans un tas (\textit{PriorityBlockingQueue}\footnote{https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/PriorityBlockingQueue.html} de java) où ils sont triés en fonction de leur poids. 
 
-Conséquemment, chaque arc du graphe est caractérisé par sa source, sa destination, son poids, un
-
-La construction du graphe est l'étape la plus coûteuse de l'assemblage de fragments. -> multithreading grâce aux streams.
+Cette étape étant de loin la plus coûteuse en temps de l'assemblage de fragments, nous avons décidé de paralléliser les calculs des arcs pour exploiter au maximum les multiples cœurs du processeur. Ce multithreading est concrètement réalisé à l'aide des streams java (plus précisément les \textit{IntStream}\footnote{https://docs.oracle.com/javase/8/docs/api/java/util/stream/IntStream.html} qui gèrent eux-mêmes la parallélisation. Ce multithreading a imposé l'utilisation de structures de données \textit{threadsafe}, ce qui explique l'utilisation d'une \textit{PriorityBlockingQueue} pour stocker les arcs et d'un \textit{Vector} pour marquer les fragments inclus.
 
 
+\textcolor{red}{
+Chaque nœud d'un graphe contient un fragment $f$ et son complémentaire-inversé $f'$. }
+
+
+
+\textcolor{red}{
+Au vu du grand nombre d'arcs à stocker, nous avons choisi d'utiliser un objet\\
+Conséquemment, chaque arc du graphe est caractérisé par sa source, sa destination, son poids, un}
+
+
+\textcolor{blue}{
+Dire :
+- deux matrices pour calculer 8 arcs et pourquoi\\
+- un seul noeud pour $f$ et $f'$
+- comment sont stockés les arcs (dans un tas, pour y avoir accès par ordre de poids décroissant)\\
+- un objet arc ne contient que trois entiers et deux booléens\\
+- on ne construit pas d'arc vers un fragment déjà inclus\\
+- lors de la construction de graphe, on regarde juste le score des arcs et on ne reconstitue pas l'alignement\\
+- parler de la complexité en temps et en espace de cette étape
+}
 
 \subsection{Chemin hamiltonien}
 
@@ -207,13 +233,21 @@ Pendant ce parcours des arcs, un arc $f \to g$ est accepté dans le chemin hamil
 
 L'algorithme s'arrête quand tous les sommets du graphe sont traversés par le chemin créé.
 
-Concernant nos choix d'implémentation, nous 
+Concernant nos choix d'implémentation,
+\\~\\
+\textcolor{blue}{
+- Parler des union-find pour gérer les ensembles\\
+- Des tableaux \textit{in} et \textit{out}\\
+- Rappeler que les fragments inclus sont ignorés\\
+- Expliquer tieBreaks : quels sont ils et pourquoi en mettre\\
++ Complexité de cette étape
+}
 
 \subsection{Propagation des gaps}
 
 L'étape de propagation des gaps consiste à aligner les différents fragments selon le chemin hamiltonien construit à l'étape précédente. Cette étape consiste donc à transformer l'ensemble d'arcs du chemin en un ensemble de fragments alignés. 
 
-Pour réaliser cet alignement de nombreux fragments, il faut, pour chaque paire d'arcs consécutifs du chemin hamiltonien (i.e., chaque paire d'arcs $f \to g$ et $g \to h$), \textcolor{red}{aligner} le $g$ obtenu dans l'alignement $f \to g$ avec le $g$ obtenu dans l'alignement $g \to h$. A chaque fois qu'un gap est inséré dans le $g$ de l'arc $f \to g$, il faut l'insérer dans tous les fragments précédant $g$ dans le chemin. Similairement, lorsqu'un gap est ajouté dans le $g$ de l'arc $g \to h$, il faut le propager dans tous les fragments suivants $g$ dans le chemin hamiltonien. 
+Pour réaliser cet alignement de nombreux fragments, il faut, pour chaque paire d'arcs consécutifs du chemin hamiltonien (i.e., chaque paire d'arcs $f \to g$ et $g \to h$), aligner le $g$ obtenu dans l'alignement $f \to g$ avec le $g$ obtenu dans l'alignement $g \to h$. A chaque fois qu'un gap est inséré dans le $g$ de l'arc $f \to g$, il faut l'insérer dans tous les fragments précédant $g$ dans le chemin. Similairement, lorsqu'un gap est ajouté dans le $g$ de l'arc $g \to h$, il faut le propager dans tous les fragments suivants $g$ dans le chemin hamiltonien. 
 
 Pour illustrer, prenons les fragments $f =$ acaatgatc, $g =$ caagatcagga et $h =$ agagtcaggacc et considérons le chemin hamiltonien $f \to g \to h$.
 
@@ -237,7 +271,7 @@ acaatga-tc------
 ---a-gagtcaggacc
 \end{boxedverbatim}.
 
-Le but est donc de faire correspondre le $g$ du premier arc avec le $g$ du second en ajoutant les gaps nécessaires, tout en propageant ces gaps vers le haut ou vers le bas. On peut par exemple voir un gap ajouté à la 5\up{e} ligne et propagé vers le haut, ou encore un gap ajouté à la 8\up{e} ligne, propagé vers le bas.
+Le but est donc de faire correspondre le $g$ du premier arc avec le $g$ du second en ajoutant les gaps nécessaires, tout en propageant ces gaps vers le haut ou vers le bas. On peut par exemple voir un gap ajouté à la 5\up{e} ligne et propagé vers le haut, ou encore un gap ajouté à la $8^e$ ligne, propagé vers le bas.
 
 En résumé, la propagation des gaps consiste à parcourir successivement les arcs du chemin, et pour chaque couple d'arcs successifs
 $f \to g$ et $g \to h$, parcourir les deux $g$ obtenus de la gauche vers la droite en ajoutant des gaps en haut ou en bas dans le but d'aligner complètement ces deux $g$. Tous les gaps ajoutés sont propagés respectivement vers le haut ou le bas. Une fois que les $g$ sont complètement alignés, on passe à l'arc suivant.
@@ -246,9 +280,6 @@ $f \to g$ et $g \to h$, parcourir les deux $g$ obtenus de la gauche vers la droi
 
 Ici vont être abordées les spécificités propres à notre implémentation. La première question qui s'est posée au moment d'implémenter la propagation des gaps était relative à la structure de données utilisée pour stocker l'ensemble d'arcs utilisés par le chemin hamiltonien. 
 L'algorithme glouton utilisé pour construire le chemin nous donne les arcs par ordre de poids décroissants, et donc pas dans l'ordre qui correspondrait à un parcours de ce chemin. Pour avoir les arcs dans cet ordre et ainsi pouvoir aligner deux à deux les arcs consécutifs, il faut trier les arcs du chemin.
-
-\textcolor{red}{
-Or pour réaliser l'alignement de tous les fragments consiste  il faut aligner tous les arcs consécutifs. Cela signifie qu'il faut, à partir d'un arc, pouvoir trouver facilement l'arc suivant (ou précédent) dans le chemin hamiltonien. Autrement}
 
 Pour effectuer ce tri, trois solutions ont été envisagées :
 \begin{itemize}
@@ -262,16 +293,13 @@ Pour effectuer ce tri, trois solutions ont été envisagées :
 C'est finalement la deuxième solution qui a été implémentée. D'après sa complexité, la première a été rapidement écartée (le pire cas des tables de hachage étant évitable grâce à un bon choix de la fonction de hachage et de la taille de la table). 
 La troisième solution a comme avantage sur la deuxième de permettre de commencer à partir d'un fragment quelconque. Par contre, elle nécessite une table occupant deux fois plus d'espace et elle rend plus complexe l'implémentation. La difficulté supplémentaire d'implémentation est liée au fait que si les arcs sont traités en partant du premier, propager les gaps vers le bas revient à insérer des gaps dans un seul fragment, alors que traiter les arcs en suivant le chemin à l'envers implique de pouvoir propager les gaps vers le bas sur plusieurs fragments.
 
-En itérant sur la liste des clés de la table qui contient le chemin, et en comparant chacune de ces clés avec l'entrée correspondante dans le tableau \textit{in} utilisé pour l'algorithme glouton, on peut trouver le premier arc du chemin en $O(n+m)$ (où $n$ est le nombre d'arcs et $m$ est la capacité de la \textit{HashMap}\footnote{\textcolor{red}{Voir la documentation java}}). En effet, la source du premier chemin est le seul nœud qui n'est pas une destination d'un arc du chemin, et donc le seul pour lequel l'entrée du tableau \textit{in} vaudra $0$. Puisque 
+En itérant sur la liste des clés de la table qui contient le chemin, et en comparant chacune de ces clés avec l'entrée correspondante dans le tableau \textit{in} utilisé pour l'algorithme glouton, on peut trouver le premier arc du chemin en $O(n+m)$ (où $n$ est le nombre d'arcs et $m$ est la capacité de la \textit{HashMap}\footnote{\textcolor{red}{D'après la documentation java}}). En effet, la source du premier chemin est le seul nœud qui n'est pas une destination d'un arc du chemin, et donc le seul pour lequel l'entrée du tableau \textit{in} vaudra $0$. \textcolor{red}{dire que la capacité de la hashmap vaut n/0.75 car 0.75 est le facteur de charge par défaut, et que nous l'avons laissé comme ça}.
 
 Au vu du peu de temps nécessaire pour trouver le premier fragment, et tenant compte des autres avantages et défauts des deuxièmes et troisièmes solutions, nous avons choisi d'implémenter la deuxième.
 \\~\\ 
  
 Après avoir choisi le moyen de trier nos arcs, s'est posé le problème du choix de la structure utilisée pour stocker les fragments en train d'être alignés. Pour cela, il faut une structure permettant facilement l'insertion d'un caractère à un indice donné. Les \textit{LinkedList}\footnote{https://docs.oracle.com/javase/7/docs/api/java/util/LinkedList.html} de java, qui sont des listes doublement chaînées, ont été choisies. Dans une première implémentation, naïve, une \textit{LinkedList} était utilisée pour stocker l'ensemble des caractères des fragments alignés. 
 Le problème de cette implémentation est qu'elle s'est avérée extrêmement peu efficace (plus d'une demi-heure sur la plus grande collection de fragments). 
-
-\textcolor{red}{
-Ainsi, lorsqu'un gap devait être propagé vers le haut, il devait être inséré dans les $k$ \textit{LinkedList} correspondants aux $k$ fragments déjà traités. Et lorsqu'un gap devait être propagé vers le bas, il fallait l'insérer dans le fragment en train d'être traité.}
 
 Afin d'améliorer cette première implémentation, plusieurs modifications ont été apportées.
 
@@ -289,14 +317,14 @@ tccgaagtctgct----------------------------------
 
 On constate que la majorité des caractères que chacun de ces fragments sont des gaps situés à la fin ou au début du mot. Plus l'exemple est grand, plus la proportion de gaps est importante. Pour le plus grand exemple, tous les mots alignés comptent environ $100000$ caractères, alors que chacun d'entre eux provient d'un fragment qui compte en $500$ et $700$ caractères. Sur les $100000$ caractères, on a donc énormément de gaps situés avant ou après une zone d'environ $700$ caractères. L'idée est d'éviter d'utiliser $n$ nœuds de \textit{LinkedList} (un Byte dans chaque nœud) pour stocker tous ces gaps.
 Chaque \textit{FragmentBuilder} a donc deux entiers \textit{startGaps} et \textit{endGaps} qui stockent respectivement le nombre de gaps situés au début et à la fin du mot. Pour stocker les caractères situés entre ces gaps, une \textit{LinkedList} est toujours utilisée. Ce changement permet d'économiser de la mémoire en utilisant seulement deux entiers là où étaient nécessaires jusqu'à plus de $99000$ nœuds de \textit{LinkedList} auparavant. 
-\textcolor{red}{Ce changement permet aussi d'ajouter des gaps simplement en incrémentant un entier plutôt qu'en ajoutant un noeud}
 
 Une autre amélioration est l'utilisation de \textit{ListIterator} pour itérer sur les listes chaînées en $O(n)$. En effet atteindre le $i^e$ d'une liste chaînée demande de parcourir les $i-1$ éléments précédents (éventuellement moins dans le cas d'une liste non chaînée, mais la complexité reste inchangée). Atteindre le $i^e$ élément de la liste pour $i$ allant de 1 à $n$ donne donc une complexité du parcours en $0(n^2)$.
 
-Le dernier changement notable est simplement l'exploitation du fait que pour deux fragments alignés $f$ et $g$, avoir $f$ situé avant $g$ dans le chemin hamiltonien (et donc $f$ situé plus haut que $g$ dans le tableau de fragments alignés) implique que \textit{endGaps}$(f) > $  \textit{endGaps}$(g)$. Ceci signifie que lorsqu'un gap est inséré à un indice se trouvant dans la zone des gaps de fin dans un fragment du tableau, alors cet indice se trouvera aussi dans la zone des gaps de fin pour tous les fragments situés plus haut dans le tableau. 
+Pour aligner les deux $g_i$ des arcs $f \to g_1$ et $g_2 \to h$, on ajoute directement \textit{startGaps}$(g_1)$ gaps au début de $g_2$ et ensuite comparer le restant du $g1$ et $g2$ à partir de cet indice. Cette opération est possible parce que, par définition de $g2 \to h$, $g2$ ne peut pas commencer par des gaps. Ceci évite un grand nombre de comparaisons inutiles.
 
-
-\textcolor{red}{, lors de la comparaison des deux $g_i$ des arcs $f \to g_1$ et $ g_2 \to h$, d'ajouter directement \textit{startGaps}$(g_1)$ gaps au début de $g_2$ et de comparer ensuite les deux mots caractère par caractère pour le reste du mot.}
+\textcolor{blue}{
+Le dernier changement notable est simplement l'exploitation du fait que pour deux fragments alignés $f$ et $g$, avoir $f$ situé avant $g$ dans le chemin hamiltonien (et donc $f$ situé plus haut que $g$ dans le tableau de fragments alignés) implique que \textit{endGaps}$(f) > $  \textit{endGaps}$(g)$. On en déduit que lorsqu'un gap est inséré à un indice se trouvant dans la zone des gaps de fin dans un fragment du tableau, alors cet indice se trouvera aussi dans la zone des gaps de fin pour tous les fragments situés plus haut dans le tableau. De cette manière, si un gap est inséré dans la zone des gaps de fin pour le mot de la $j^e$ ligne du tableau, il n'est pas nécessaire de l'insérer pour les lignes d'indices allant de 0 à $j-1$. En effet, ces gaps ne servent qu'à faire en sorte que les mots aient la même longueur. Pour avoir malgré tout un tableau de fragments alignés à la fin, on ajoute autant de gaps que nécessaire à la fin des mots pour qu'ils aient tous la même longueur que le plus long d'entre eux -  qui est le dernier du tableau. On évite ainsi d'ajouter les gaps de fin un par un.
+}
 
 Avec toutes ces modifications, l'étape de propagation se fait en $O(n*m)$, où $n$ est la taille du chemin hamiltonien et $m$ la taille maximale d'un fragment. En effet, on traite les $n$ fragments du chemin, et pour chacun d'eux on parcourt (en temps linéaire) uniquement la zone située entre les gaps du début et les gaps de fin. Dans la version précédente, ajouter un nouveau mot demandait d'ajouter un par un les $n$ gaps du début, et de propager sur tous les fragments déjà traités les gaps de fin. Si pour les petites instances le gain de temps n'a pas été déterminant - bien que non négligeable -, les changements ont permis de réduire le temps de propagation des gaps de plus d'une demi-heure à moins d'une demi-seconde.
 
@@ -316,10 +344,12 @@ En cas d'égalité entre deux caractères, le caractère résultant est choisi s
 
 \section{Qualité du projet}
 
-Nous avons eu recours aux streams pour la construction des arcs du graphe. Le multithreading est la capacité à pouvoir effectuer plusieurs taches ($threads$) simultanément. Le principal avantage est le gain de temps très important qu'apporte cette méthode. Cependant, comme les taches sont gérer en même temps , les résultats peuvent ne pas être cohérent. Le problème majeur de cette méthode est le non déterminisme des résultats.
+
 
 Les tests unitaires, bien que non-exhaustifs, permettent quasiment d'avoir la certitude du bon fonctionnement de nos méthodes.
 
+
+Pour am
 
 
 \section{Conclusion}
