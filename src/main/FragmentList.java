@@ -18,6 +18,8 @@ public class FragmentList extends ArrayList<Fragment> {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private int collectionNum;
+	
 	/**
 	 * Read the given file and convert data into fragment 
 	 * @param filename, the filepath to the file to read
@@ -29,6 +31,7 @@ public class FragmentList extends ArrayList<Fragment> {
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
 			String line;
 			line = reader.readLine();
+			fragments.collectionNum = Integer.parseInt(String.valueOf(line.charAt(line.length()-1)));
 			while(line != null) {
 				StringBuilder fragment = new StringBuilder();
 				
@@ -58,20 +61,20 @@ public class FragmentList extends ArrayList<Fragment> {
 	 * @param collectionName the name that identifies the collection
 	 * @param filename the path to the file to write
 	 */
-	public static void writeToFile(Fragment f, String collectionName, String filename) {
+	public static void writeToFile(Fragment f, int collectionNumber, String filename) {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-			writer.write("> Groupe-4 Collection "+collectionName);
+			writer.write("> Groupe-4 Collection "+collectionNumber);
 			writer.write(" Longueur "+Integer.toString(f.size()));
 			writer.newLine();
 			int i = 0;
 			String result = f.toString();
-			while ((i+1)*81<f.size()) {
-				writer.write(result.substring(i*81, (i+1)*81));
+			while ((i+1)*80<f.size()) {
+				writer.write(result.substring(i*80, (i+1)*80));
 				writer.newLine();
 				i++;
 			}
-			writer.write(result.substring(i*81, f.size()));
+			writer.write(result.substring(i*80, f.size()));
 			writer.close();
 		} catch (IOException e) {
 			System.out.println("Erreur dans le fichier");
@@ -90,6 +93,10 @@ public class FragmentList extends ArrayList<Fragment> {
 			result.append("\n");
 		}
 		return result.toString();
+	}
+
+	public int getCollectionNum() {
+		return collectionNum;
 	}
 	
 }

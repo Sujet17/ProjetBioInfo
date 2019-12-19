@@ -136,10 +136,16 @@ public class OverlapGraph {
 		
 		manageIncludedFragments(struct);
 		
+		int oldWeight;
+		
 		Arc arc = arcs.poll();
+		oldWeight = arc.getWeight();
 		while (arc != null) {
+			if (arc.getWeight()>oldWeight)
+				System.out.println("ERREUR");
+			else
+				oldWeight = arc.getWeight();
 			if (isAvailableArc(struct, arc, in, out)) {
-				//System.out.println(arc.getWeight());
 				int f = arc.getSource();
 				int g = arc.getDestination();
 				
@@ -147,7 +153,7 @@ public class OverlapGraph {
 				in[g] = getVal(arc, false);
 				out[f] = getVal(arc, true);
 				struct.union(f, g);
-			}			
+			}	
 			if (struct.onlyOneSet())
 				break;
 			arc = arcs.poll();
@@ -159,7 +165,6 @@ public class OverlapGraph {
 				break;
 			}
 		}
-		System.out.println("Poids total du chemin : "+path.totalWeight);
 		return path;
 	}
 	
@@ -168,16 +173,10 @@ public class OverlapGraph {
 	 * @param struct
 	 */
 	public void manageIncludedFragments(UnionFind struct) {
-		int cnt = 0;
 		for (int i=0; i<included.size(); i++) {
-			System.out.print(included.get(i)+" ");
-			if (included.get(i) != -1) {
+			if (included.get(i) != -1) 
 				struct.union(i, included.get(i));
-				cnt++;
-			}
 		}
-		System.out.println();
-		System.out.println((float)cnt/fragments.size()+" "+cnt+" "+fragments.size());
 	}
 	
 	/**

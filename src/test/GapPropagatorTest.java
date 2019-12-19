@@ -29,7 +29,7 @@ public class GapPropagatorTest {
 		
 		HamiltonPath path = graph.getHamiltonPath();
 		
-		assertEquals(path.getStart().getSource(), 3);
+		assertEquals(path.getStart().getSource(), 0);
 		
 		
 		GapPropagator gp = new GapPropagator(fl);
@@ -41,13 +41,13 @@ public class GapPropagatorTest {
 		
 		//printDebug(path, fl, tab);
 		
-		assertEquals(tab[0], new Fragment("tccgaagtctgct----------------------------------"));
-		assertEquals(tab[1], new Fragment("---------tgctgctggag---------------------------"));
-		assertEquals(tab[2], new Fragment("----------actactag-gcc-------------------------"));
-		assertEquals(tab[3], new Fragment("----------------ag-gtcaactgatc-----------------"));
-		assertEquals(tab[4], new Fragment("---------------------caactg-ccaaaaa------------"));
-		assertEquals(tab[5], new Fragment("----------------------aac---ccaaaaagggg--------"));
-		assertEquals(tab[6], new Fragment("-----------------------------------gggggggtcggt"));
+		assertEquals(tab[0], new Fragment("actactaggcc--------------------------------------------"));
+		assertEquals(tab[1], new Fragment("------aggtcaactgatc------------------------------------"));
+		assertEquals(tab[2], new Fragment("----------caactg-ccaaaaa-------------------------------"));
+		assertEquals(tab[3], new Fragment("-----------aac---ccaaaaagggg---------------------------"));
+		assertEquals(tab[4], new Fragment("------------------------gggggggtcggt-------------------"));
+		assertEquals(tab[5], new Fragment("-----------------------------------tccgaagtctgct-------"));
+		assertEquals(tab[6], new Fragment("--------------------------------------------tgctgctggag"));
 		
 	}
 	
