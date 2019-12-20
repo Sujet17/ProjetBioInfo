@@ -72,11 +72,9 @@ public class ConsensusVote {
 		 */
 		short[] cntTab = new short[4];
 		
-		//For every row, count the number of -2(g), -1(t), 1(a) and 2(c). 0(gaps) are ignored. 
-		
-		
 		int startLine = 0;
-		
+		//For every row, count the number of -2(g), -1(t), 1(a) and 2(c). 0(gaps) are ignored. 
+			
 		for (int j=0; j<fragmentSize; j++) {
 			while (startLine<fbArray.length-1 && j>fbArray[startLine].size()-1)
 				startLine++;

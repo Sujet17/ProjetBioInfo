@@ -36,9 +36,9 @@ public class GapPropagator {
 		g1 = couple.g;
 		
 		int i = 0;
+		
+		//for every arc f -> g, find the arc g->f and align the two g
 		for (i=1; i<path.size(); i++) {
-			
-			//System.out.println("Cnt : "+i);
 			
 			result[i] = g1; 
 			arc = path.get(arc.getDestination());
@@ -53,6 +53,9 @@ public class GapPropagator {
 			g2.addStartGaps(g1.getStartGaps());
 			h.addStartGaps(g1.getStartGaps());
 			
+			/*
+			 * ListIterators to browse g2 and h in linear time
+			 */
 			ListIterator<Byte> iteratorG2 = g2.innerList().listIterator();
 			ListIterator<Byte> iteratorH = h.innerList().listIterator();
 			
@@ -61,17 +64,17 @@ public class GapPropagator {
 				if (j >= h.getStartGaps())
 					iteratorH.next();
 				if (g1.byteAt(j) != byteG2) {
-					if (g1.byteAt(j) == 0) {
+					if (g1.byteAt(j) == 0) { //Case where a gap is inserted in g2 and h
 						iteratorG2.previous();
 						iteratorG2.add((byte)0);
 						if (j >= h.getStartGaps()) {
 							iteratorH.previous();
 							iteratorH.add((byte)0);
 						}
-						else
+						else 
 							h.addStartGaps(1);
 					}
-					else if (byteG2 == 0) {
+					else if (byteG2 == 0) { //Case where a gap is inserted to the top
 						insertGap(i, j);
 					}
 				}
@@ -90,12 +93,19 @@ public class GapPropagator {
 		return result;
 	}
 	
+	/**
+	 * Used to propagate the gap to the top
+	 * A gap is inserted in each line at the specified column
+	 * The gap insertion is done from resultIndex line to the first line
+	 * The propagation to the top is stopped when the column index is after the innerList of a FragmentBuilder
+	 * 
+	 * @param resultIndex The line to start the propagation
+	 * @param gapIndex The column index to propagate the gap
+	 */
 	private void insertGap(int resultIndex, int gapIndex) {
 		for (int i = resultIndex; i>=0; i--) {
-			if (gapIndex < result[i].size()) {
-				//System.out.println("Bonjour "+i);
+			if (gapIndex < result[i].size()) 
 				result[i].insert(gapIndex, (byte)0);
-			}
 			else
 				break;
 		}
@@ -133,11 +143,11 @@ public class GapPropagator {
 		
 		for (int i=0; i<f.size(); i++) 
 			fNew.addFirst(f.byteAt(i));
-		gNew.addStartGaps(f.size());
+		fNew.addEndGaps(g.size());
 		
+		gNew.addStartGaps(f.size());
 		for (int i=0; i<g.size(); i++) 
 			gNew.addFirst(g.byteAt(i));		
-		fNew.addEndGaps(f.size());
 		
 		return new AlignedFragments(fNew, gNew);
 	}

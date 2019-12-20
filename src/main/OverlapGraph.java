@@ -67,7 +67,6 @@ public class OverlapGraph {
 	 */
 	private void buildArcs(int indexF, int indexG) {
 		
-
 		Fragment f = fragments.get(indexF);
 		Fragment g = fragments.get(indexG);
 		

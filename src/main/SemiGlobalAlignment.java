@@ -293,12 +293,24 @@ public class SemiGlobalAlignment {
 		return new MatrixCell(i, j);
 	}
 	
+	/**
+	 * Check if the alignment in a cell is build from the above cell
+	 * @param i The line of the cell
+	 * @param j The column of the cell
+	 * @return true of the alignment in a cell is build from the above cell
+	 */
 	private boolean matchUp(int i, int j) {
 		int score = alignmentMatrix[i][j];
 		int scoreUp = alignmentMatrix[i-1][j];
 		return score == scoreUp + GAP_PENALTY;
 	}
 	
+	/**
+	 * Check if the alignment in a cell is build from the above-left cell
+	 * @param i The line of the cell
+	 * @param j The column of the cell
+	 * @return true of the alignment in a cell is build from the above-left cell
+	 */
 	private boolean matchDiag(int i, int j) {
 		int score = alignmentMatrix[i][j];
 		int scoreDiag = alignmentMatrix[i-1][j-1];

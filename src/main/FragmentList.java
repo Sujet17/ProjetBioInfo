@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 /**
  * This class is used to store an arrayList of fragments.
- * It is also used for reading and writing files with data. 
+ * It is also used for reading and writing files operations. 
  *
  */
 public class FragmentList extends ArrayList<Fragment> {

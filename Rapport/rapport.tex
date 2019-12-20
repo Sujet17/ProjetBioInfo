@@ -59,22 +59,17 @@ L'objectif de ce projet est l'implémentation d'une solution au problème d'asse
 
 Plus précisément, le but de ce projet est de fournir un programme java prenant en entrée une collection de fragments et capable de reconstituer au mieux la séquence d'origine. Au vu de la grande taille des problèmes, une grande attention doit être portée à la complexité en temps et en mémoire. Certaines collections de fragments et leurs séquences cibles respectives sont à disposition pour permettre d'évaluer la qualité du programme (la comparaison entre la séquence cible et la séquence obtenue par le 
 programme étant effectuée à l'aide de l'outil $dotmatcher$).
-\textcolor{red}{Précisons que l'ADN n'est vu et traité que sous son abstraction en temps que chaîne de caractères.}
+Précisons que l'ADN n'est vu et traité que sous son abstraction en temps que chaîne de caractères.
 
-Les fragments reçus en entrée sont des chaînes des caractères (dont la longueur varie entre 500 et 700 caractères). Les différents caractères sont des $a$, $c$, $t$ et $g$ correspondant \textcolor{red}{respectivement à adénine, cytosine, thymine, guanine, qui sont} au différentes molécules de base constituant l'ADN.
+Les fragments reçus en entrée sont des chaînes des caractères (dont la longueur varie entre 500 et 700 caractères). Les différents caractères sont des $a$, $c$, $t$ et $g$ correspondant respectivement à adénine, cytosine, thymine et guanine, qui sont les différentes molécules de base constituant l'ADN.
 
 
 \section{Organisation du travail}
 
-\textcolor{red}{
-Cette section traite des différents outils utilisés pour réaliser ce projet et de la répartition des tâches au sein du groupe.}
-
 Les différentes étapes du projet ont été implémentées dans l'ordre dans lequel elles sont présentées dans la section suivante. 
 L'implémentation d'une étape ne commençait qu'une fois l'étape précédente terminée et testée. Plutôt que d'assigner à chaque membre du groupe des parties entières du travail, nous travaillions simultanément sur les mêmes parties du projet. En conséquence, il est impossible de mettre en évidence une répartition claire des tâches. Cette approche nous a permis de nous concentrer successivement sur chacune des parties du projet. S'il fallait changer quelque chose à une étape précédente, les tests unitaires nous permettaient de vérifier que les changements ne corrompent pas le programme. \textcolor{red}{ De plus, avoir tous deux connaissance de l'implémentation précise des autres parties du projet permet de m}
 
-
-
-L'outil $git$ a été utilisé pour le contrôle de version.\textcolor{red}{, et le projet a été implémenté sous \textit{java 11}.}
+L'outil $git$ a été utilisé pour le contrôle de version, et le projet a été implémenté sous \textit{java 11}.
 
 
 \newpage
@@ -177,13 +172,15 @@ caagatcagga--------
 \end{verbatim}
 
 
+Cette étape nécessite de calculer et stocker $n*m$ scores, avec $n$ et $m$ les tailles de $f$ et $g$. Pour éviter l'utilisation inutile de mémoire, les scores dans la matrice sont \textit{short}.
+
 \subsection{Overlap graph}
 
 L'\textit{overlap graph} est un graphe orienté et pondéré dont les sommets sont des fragments. Les arcs sont déterminés d'après les alignements semi-globaux. Soit $w$ le score de l'alignement semi-global entre $f$ et $g$, alors l'arc du graphe allant de $f$ à $g$ aura un poids de $w$. Dans notre cas, les fragments données en entrée et leurs complémentaires-inversés sont les sommets du graphe.
 
 Pour construire ce graphe, il faut rechercher l'alignement semi-global optimal pour chaque paire de fragments du graphe (excepté les paires constituées d'un fragment et son complémentaire-inversé).
 
-De chaque sommet part un arc vers tous les autres - excepté son complémentaire-inversé. Il y a donc $n*(n-2)$ arcs à calculer - où $n$ est le nombre de sommets du graphe. On a pu voir à la section précédente qu'une seule matrice d'alignement permet de trouver à la fois l'arc $f\to g$ et l'arc $g \to f$. On sait aussi que les arcs $f \to g$ et $g' \to f'$  (avec $f'$ et $g'$ les complémentaires-inversés de $f$ et $g$) ont le même poids. Par conséquent, on peut calculer les poids des 8 arcs entre les sommets $f$, $f'$, $g$ et $g'$ en construisant uniquement deux matrices d'alignement semi-global. Au final $\frac{n*(n-2)}{8}$ matrices devront être construites.
+De chaque sommet part un arc vers tous les autres - excepté son complémentaire-inversé. Il y a donc $n*(n-2)$ arcs à calculer (où $n$ est le nombre de sommets du graphe). On a pu voir à la section précédente qu'une seule matrice d'alignement permet de trouver à la fois l'arc $f\to g$ et l'arc $g \to f$. On sait aussi que les arcs $f \to g$ et $g' \to f'$  (avec $f'$ et $g'$ les complémentaires-inversés de $f$ et $g$) ont le même poids. Par conséquent, on peut calculer les poids des 8 arcs entre les sommets $f$, $f'$, $g$ et $g'$ en construisant uniquement deux matrices d'alignement semi-global. Au final $\frac{n*(n-2)}{8}$ matrices devront être construites.
 
 \textcolor{red}{
 S'il faut aussi considérer les fragments complémentaires-inversés dans le graphe, c'est parce les fragments issus du séquençage peuvent provenir du brin $3' \to 5'$ ou du brin $5' \to 3'$. Le problème d'assemblage de fragments consiste à reconstituer un seul des deux brins, ce qui demande d'écarter les fragments provenant du mauvais brin. }
@@ -191,37 +188,22 @@ S'il faut aussi considérer les fragments complémentaires-inversés dans le gra
 Certains fragments du graphe peuvent être inclus à d'autres. Ceci s'explique par le fait que les fragments peuvent provenir du brin $3' \to 5'$ ou du brin $5' \to 3'$. Prenons le cas de deux fragments $f$ et $g$ provenant chacun d'un brin différent, et correspondant tous deux à la même zone de la double-hélice d'ADN. Alors $f$ sera très similaire à $g'$. Dans ce cas, l'inclusion sera détectée lors de l'alignement semi-global, et le fragment le plus court sera considéré comme inclus à l'autre. 
 Nous avons pris le parti d'écarter du graphe un fragment dès que son inclusion à un autre fragment est détectée - le complémentaire-inversé est lui aussi écarté. C'est une manière non exacte d'écarter les fragments provenant du mauvais brin.
 
-Le fait d'écarter les fragments inclus à d'autres a un grand impact sur le temps de calcul du graphe. En effet, pour chacune des collections de fragments, 80\% des fragments s'avéraient être inclus à d'autre. Cela réduit d'un facteur 5 le nombre de sommets du graphe et donc d'un facteur 25 le nombre d'arcs à calculer. En réalité, le gain n'est pas aussi important puisque les inclusions ne sont pas connues à l'avance, ce qui fait que certains arcs seront construits vers et depuis des fragments inclus. Néanmoins, une fois que l'inclusion a été détectée, plus aucun arc ne sera construit vers ou depuis le fragment concerné. Quant aux arcs construits inutilement, ils seront simplement ignorés.
+Le fait d'écarter les fragments inclus à d'autres a un grand impact sur le temps de calcul du graphe. En effet, pour chacune des collections de fragments, 80\% des fragments s'avéraient être inclus à d'autre. Cela réduit d'un facteur 5 le nombre de sommets du graphe et donc d'un facteur 25 le nombre d'arcs à calculer. En réalité, le gain n'est pas aussi important puisque les inclusions ne sont pas connues à l'avance, ce qui fait que certains arcs seront construits vers et depuis des fragments inclus. Néanmoins, une fois que l'inclusion a été détectée, plus aucun arc ne sera construit vers (ou depuis) le fragment concerné. Quant aux arcs construits inutilement, ils seront simplement ignorés.
 
 Puisque le graphe est construit dans l'unique but de parcourir les arcs par ordre décroissant pour construire le chemin hamiltonien, nous avons choisi de mettre tous les arcs dans un tas (\textit{PriorityBlockingQueue}\footnote{https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/PriorityBlockingQueue.html} de java) où ils sont triés en fonction de leur poids. 
 
 Cette étape étant de loin la plus coûteuse en temps de l'assemblage de fragments, nous avons décidé de paralléliser les calculs des arcs pour exploiter au maximum les multiples cœurs du processeur. Ce multithreading est concrètement réalisé à l'aide des streams java (plus précisément les \textit{IntStream}\footnote{https://docs.oracle.com/javase/8/docs/api/java/util/stream/IntStream.html} qui gèrent eux-mêmes la parallélisation. Ce multithreading a imposé l'utilisation de structures de données \textit{threadsafe}, ce qui explique l'utilisation d'une \textit{PriorityBlockingQueue} pour stocker les arcs et d'un \textit{Vector} pour marquer les fragments inclus.
 
+Dans le graphe tel que nous l'avons implémenté, chaque nœud d'un graphe contient un fragment $f$ et son complémentaire-inversé $f'$, plutôt que d'avoir deux nœuds distincts. Ce choix ne change rien à la logique du graphe. Cette implémentation est d'abord motivée par le fait qu'aucun arc n'est construit entre un fragment et son complémentaire. Elle permet aussi de marquer comme inclus un fragment et son complémentaire en même temps.
 
-\textcolor{red}{
-Chaque nœud d'un graphe contient un fragment $f$ et son complémentaire-inversé $f'$. }
+Par contre les arcs doivent indiquer, pour le nœud source comme pour le nœud destination, quel fragment parmi les deux du nœud il concerne. Ainsi, un arc tel qu'il est stocké dans le tas est un objet qui contient trois attributs entiers correspondant à son nœud source, son nœud destination et son poids, et deux attributs booléens indiquant l'un pour la source l'autre pour la destination quel fragment parmi les deux du nœud est concerné.
 
-
-
-\textcolor{red}{
-Au vu du grand nombre d'arcs à stocker, nous avons choisi d'utiliser un objet\\
-Conséquemment, chaque arc du graphe est caractérisé par sa source, sa destination, son poids, un}
-
-
-\textcolor{blue}{
-Dire :
-- deux matrices pour calculer 8 arcs et pourquoi\\
-- un seul noeud pour $f$ et $f'$
-- comment sont stockés les arcs (dans un tas, pour y avoir accès par ordre de poids décroissant)\\
-- un objet arc ne contient que trois entiers et deux booléens\\
-- on ne construit pas d'arc vers un fragment déjà inclus\\
-- lors de la construction de graphe, on regarde juste le score des arcs et on ne reconstitue pas l'alignement\\
-- parler de la complexité en temps et en espace de cette étape
-}
+Notons que lors de la construction du graphe, on ne va pas reconstruire réellement l'alignement correspondant à chaque arc, mais seulement regarder le score lié à cet alignement pour pouvoir instancier l'arc. La correspondance entre un arc et l'alignement semi-global correspondant est effectuée juste avant l'étape de propagation d'étape. Ceci permet d'éviter de devoir stocker deux fragments (les versions alignées des fragments) pour chaque arc. 
+Comme désavantage, il faut recalculer les matrices d'alignement semi-global pour chaque arc du chemin hamiltonien, au moment de la propagation des gaps. Mais le nombre d'arcs concernés par la propagation des gaps est tellement petit par rapport au nombre total d'arcs que ce désavantage est négligeable.
 
 \subsection{Chemin hamiltonien}
 
-Pour construire le chemin hamiltonien, nous allons retirer successivement sa racine au tas qui contient les arcs pour parcourir les arcs dans l'ordre décroissant. L'algorithme utilisé est très proche de l'algorithme de Kruskal, qui sert à la construction de l'arbre couvrant de poids minimal d'un graphe.
+L'algorithme utilisé pour construire le chemin hamiltonien est algorithme glouton, très proche de l'algorithme de Kruskal - qui sert à la construction de l'arbre couvrant de poids minimal d'un graphe. L'algorithme parcourt les chemins classés par ordre de poids décroissant.
 Pendant ce parcours des arcs, un arc $f \to g$ est accepté dans le chemin hamiltonien si :
 
 \begin{itemize}
@@ -233,15 +215,16 @@ Pendant ce parcours des arcs, un arc $f \to g$ est accepté dans le chemin hamil
 
 L'algorithme s'arrête quand tous les sommets du graphe sont traversés par le chemin créé.
 
-Concernant nos choix d'implémentation,
-\\~\\
-\textcolor{blue}{
-- Parler des union-find pour gérer les ensembles\\
-- Des tableaux \textit{in} et \textit{out}\\
-- Rappeler que les fragments inclus sont ignorés\\
-- Expliquer tieBreaks : quels sont ils et pourquoi en mettre\\
-+ Complexité de cette étape
-}
+Dans notre cas, la structure qui stocke les arcs est un tas trié de sorte à ce que sa racine soit l'arc de poids le plus important. Pour construire le chemin hamiltonien, nous allons retirer successivement sa racine à ce tas pour parcourir les arcs dans l'ordre décroissant. Cette structure permet l'accès à un arc en $O(log(n))$, et donc si tous les arcs doivent être parcourus,  on aura une complexité dans le pire cas en $O(n*log(n))$ pour le parcours (qui correspond bien à la complexité du tri par tas).
+
+Pour gérer la détection de cycle, on utilise une structure nommée \textit{Union-find}\footnote{https://en.wikipedia.org/wiki/Disjoint-set\_data\_structure}, qui est la structure classiquement utilisée pour le même rôle dans l'algorithme de Kruskal. Cette structure fournit les opérations \textit{find} et \textit{union}. Le \textit{find} permet d'identifier l'ensemble auquel appartient un élément et le \textit{union} de fusionner deux ensembles. Ces deux opérations présentent une complexité avantageuse. Pour détecter les cycles, on assigne donc au départ à chaque nœud son propre ensemble. Lorsqu'un arc $f \to g$ est choisi, l'ensemble contenant $f$ et celui contenant $g$ sont unis. Ainsi un ensemble dans le \textit{Union-find} représente un ensemble de fragments reliés par des arcs ayant été choisis dans le chemin. Pour prévenir la formation d'un cycle lors de l'ajout d'un $f \to g$, on vérifie que l'ensemble qui contient un $f$ soit différent de celui qui contient $g$.
+
+Pour marquer les fragments déjà utilisés dans le chemin, on utilise deux tableaux \textit{in} et \textit{out}. Le tableau \textit{in} marque les nœuds qui sont les destinations d'arcs du chemin, et le tableau \textit{out} marque les nœuds qui sont sources d'arcs du chemin. Comme un nœud contient deux fragments, on utilise deux valeurs différentes dans les tableaux \textit{in} et \textit{out} selon que le fragment soit le complémentaire-inversé ou non. Par exemple, si l'arc $f \to g'$ est ajouté au chemin, \textit{in}$[g]$ sera mis à 2 et \textit{out}$[f]$ sera mis à 1 (les cases du tableaux sont initialisées à 0).
+
+Pendant le parcours, tous les arcs dont la source ou la destination est un fragment marqué comme inclus sont ignorés.
+
+L'utilisation du multithreading à l'étape précédente rend non-déterministe l'ordre dans lequel les arcs sont ajoutés au tas. Pour cette raison, si l'arc utilise comme seul critère de tri le poids, il est impossible de savoir parmi deux arcs de même poids lequel sera considéré avant l'autre pendant le parcours du graphe. L'algorithme étant glouton, ce non-déterminisme a des conséquences importantes sur l'ensemble d'arcs choisi et donc sur le résultat final. Pour éviter cette situation, des critères ont été ajoutés pour trier les arcs. Le poids reste le premier critère, et les critères suivants n'interviennent qu'en cas d'égalité des poids. Ces critères sont arbitraires et ont pour seule utilité de garantir un résultat déterministe. Le premier de ces critères est l'indice du nœud source et le second (qui n'intervient qu'en cas d'égalité des deux précédents) est l'indice du nœud destination.
+
 
 \subsection{Propagation des gaps}
 
@@ -285,9 +268,9 @@ Pour effectuer ce tri, trois solutions ont été envisagées :
 \begin{itemize}
 \item utiliser un arbre de recherche équilibré (\textit{TreeSet}\footnote{https://docs.oracle.com/javase/7/docs/api/java/util/TreeSet.html} de java). Cette structure garantit l'insertion et la recherche d'un élément en en $O(log(n))$. L'idée est de stocker les arcs dans l'arbre en les triant en fonction de leur source. Ainsi, une fois qu'on a trouvé le premier arc du chemin, on peut trouver les $n-1$ suivants en $O(n(log(n))$.
 
-\item utiliser une table de hachage (\textit{HashMap}\footnote{\label{note1}https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html} de java) permettant de retrouver un arc en fonction de sa source. En utilisant une table de hachage ayant pour clés les sources des arcs et comme valeurs les arc, retrouver un arc en fonction de sa source se fait avec une complexité moyenne en $O(1)$ (bien qu'aucune garantie ne soit donnée d'avoir cette complexité pour un pire cas). Avec cette solution, trouver les $n-1$ derniers arcs du chemin se fait en moyenne en $O(n(log(n))$.
+\item utiliser une table de hachage (\textit{HashMap}\footnote{https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html} de java) permettant de retrouver un arc en fonction de sa source. En utilisant une table de hachage ayant pour clés les sources des arcs et comme valeurs les arc, retrouver un arc en fonction de sa source se fait avec une complexité moyenne en $O(1)$ (bien qu'aucune garantie ne soit donnée d'avoir cette complexité pour un pire cas). Avec cette solution, trouver les $n-1$ derniers arcs du chemin se fait en moyenne en $O(n(log(n))$.
 
-\item utiliser une table de hachage permettant de retrouver un arc en fonction de sa destination ou de sa source. Ici, l'idée est d'ajouter deux entrées dans la table pour chaque arc : une entrée associant cet arc à sa source et l'autre à sa destination. Les clés sont donc des objets constitués soit de la source et d'un booléen valant $true$, soit de la destination et d'un booléen valant $false$. Les booléens permettent de distinguer les clés qui correspondent aux sources et les clés qui correspondent aux destinations. Les valeurs sont les arcs. Cette solution permet de ne pas avoir à trouver le premier arc du chemin, puisqu'il est possible, partant d'un arc quelconque, de retrouver aussi bien l'arc suivant que l'arc précédent en $O(1)$ (en moyenne). Ainsi, il suffit de choisir un arc quelconque et trouver les $n-1$ autres arcs se fait en moyenne en $O(n(log(n))$.
+\item utiliser une table de hachage permettant de retrouver un arc en fonction de sa destination ou de sa source. Ici, l'idée est d'ajouter deux entrées dans la table pour chaque arc : une entrée associant cet arc à sa source et l'autre à sa destination. Les clés sont donc des objets constitués soit de la source et d'un booléen valant $true$, soit de la destination et d'un booléen valant $false$. Les booléens permettent de distinguer les clés qui correspondent aux sources des clés qui correspondent aux destinations. Les valeurs sont les arcs. Cette solution permet de ne pas avoir à trouver le premier arc du chemin, puisqu'il est possible, partant d'un arc quelconque, de retrouver aussi bien l'arc suivant que l'arc précédent en $O(1)$ (en moyenne). Ainsi, il suffit de choisir un arc quelconque et trouver les $n-1$ autres arcs se fait en moyenne en $O(n(log(n))$.
 \end{itemize}
 
 C'est finalement la deuxième solution qui a été implémentée. D'après sa complexité, la première a été rapidement écartée (le pire cas des tables de hachage étant évitable grâce à un bon choix de la fonction de hachage et de la taille de la table). 
@@ -299,7 +282,7 @@ Au vu du peu de temps nécessaire pour trouver le premier fragment, et tenant co
 \\~\\ 
  
 Après avoir choisi le moyen de trier nos arcs, s'est posé le problème du choix de la structure utilisée pour stocker les fragments en train d'être alignés. Pour cela, il faut une structure permettant facilement l'insertion d'un caractère à un indice donné. Les \textit{LinkedList}\footnote{https://docs.oracle.com/javase/7/docs/api/java/util/LinkedList.html} de java, qui sont des listes doublement chaînées, ont été choisies. Dans une première implémentation, naïve, une \textit{LinkedList} était utilisée pour stocker l'ensemble des caractères des fragments alignés. 
-Le problème de cette implémentation est qu'elle s'est avérée extrêmement peu efficace (plus d'une demi-heure sur la plus grande collection de fragments). 
+Bien que peu coûteuse en temps sur les petites instances, cette implémentation est qu'elle s'est avérée extrêmement peu efficace pour la grande collection - plus d'une demi-heure nécessaire pour propager les gaps. 
 
 Afin d'améliorer cette première implémentation, plusieurs modifications ont été apportées.
 
@@ -322,9 +305,7 @@ Une autre amélioration est l'utilisation de \textit{ListIterator} pour itérer 
 
 Pour aligner les deux $g_i$ des arcs $f \to g_1$ et $g_2 \to h$, on ajoute directement \textit{startGaps}$(g_1)$ gaps au début de $g_2$ et ensuite comparer le restant du $g1$ et $g2$ à partir de cet indice. Cette opération est possible parce que, par définition de $g2 \to h$, $g2$ ne peut pas commencer par des gaps. Ceci évite un grand nombre de comparaisons inutiles.
 
-\textcolor{blue}{
-Le dernier changement notable est simplement l'exploitation du fait que pour deux fragments alignés $f$ et $g$, avoir $f$ situé avant $g$ dans le chemin hamiltonien (et donc $f$ situé plus haut que $g$ dans le tableau de fragments alignés) implique que \textit{endGaps}$(f) > $  \textit{endGaps}$(g)$. On en déduit que lorsqu'un gap est inséré à un indice se trouvant dans la zone des gaps de fin dans un fragment du tableau, alors cet indice se trouvera aussi dans la zone des gaps de fin pour tous les fragments situés plus haut dans le tableau. De cette manière, si un gap est inséré dans la zone des gaps de fin pour le mot de la $j^e$ ligne du tableau, il n'est pas nécessaire de l'insérer pour les lignes d'indices allant de 0 à $j-1$. En effet, ces gaps ne servent qu'à faire en sorte que les mots aient la même longueur. Pour avoir malgré tout un tableau de fragments alignés à la fin, on ajoute autant de gaps que nécessaire à la fin des mots pour qu'ils aient tous la même longueur que le plus long d'entre eux -  qui est le dernier du tableau. On évite ainsi d'ajouter les gaps de fin un par un.
-}
+Dernière amélioration notable, on évite d'ajouter un par un les gaps de fin lorsqu'on propage vers le haut. En effet, ces gaps ne servent qu'à faire en sorte que les mots aient la même longueur. Pour avoir malgré tout un tableau de fragments alignés à la fin, on ajoute autant de gaps que nécessaire à la fin des mots pour qu'ils aient tous la même longueur que le plus long d'entre eux -  qui est le dernier du tableau. Ainsi, plutôt que d'incrémenter \textit{endGaps} $x$ fois, on incrémenter \textit{endGaps} de $x$ une seule fois.
 
 Avec toutes ces modifications, l'étape de propagation se fait en $O(n*m)$, où $n$ est la taille du chemin hamiltonien et $m$ la taille maximale d'un fragment. En effet, on traite les $n$ fragments du chemin, et pour chacun d'eux on parcourt (en temps linéaire) uniquement la zone située entre les gaps du début et les gaps de fin. Dans la version précédente, ajouter un nouveau mot demandait d'ajouter un par un les $n$ gaps du début, et de propager sur tous les fragments déjà traités les gaps de fin. Si pour les petites instances le gain de temps n'a pas été déterminant - bien que non négligeable -, les changements ont permis de réduire le temps de propagation des gaps de plus d'une demi-heure à moins d'une demi-seconde.
 
@@ -338,21 +319,26 @@ Pour éviter d'utiliser inutilement de la mémoire en instanciant des tableaux d
 
 Une petite optimisation est issue du fait que pour deux fragments alignés $f$ et $g$, avoir $f$ situé plus haut que $g$ dans le tableau \textit{FragmentBuilder} implique que \textit{startGaps}$(f) < $  \textit{startGaps}$(g)$ et \textit{endGaps}$(f) > $  \textit{endGaps}$(g)$. La première implication signifie que pour une colonne donnée, on peut s'arrêter de descendre dès qu'on arrive dans les gaps du début d'un mot, puisque chacun des mots situés plus bas aura un gap dans à cet indice. Similairement, la seconde implication permet de commencer à la ligne $j$ pour une colonne $i$ si l'indice $i-1$ se trouve dans la zone des gaps de fin de la $j^e$ ligne. 
 
- lorsqu'un gap est inséré à un indice se trouvant dans la zone des gaps de fin dans un fragment du tableau, alors cet indice se trouvera aussi dans la zone des gaps de fin pour tous les fragments situés plus haut dans le tableau. 
-
 En cas d'égalité entre deux caractères, le caractère résultant est choisi selon l'ordre arbitraire suivant (ici classés par ordre de préférence décroissante) : a, t, c, g.
 
 \section{Qualité du projet}
 
-
+\subsection{Efficacité en temps en mémoire}
+Pour évaluer la qualité de nos résultats, les séquences cibles liées à nos collections de test 
 
 Les tests unitaires, bien que non-exhaustifs, permettent quasiment d'avoir la certitude du bon fonctionnement de nos méthodes.
 
+\subsection{\'Evaluation des résultats}
 
 Pour am
 
 
 \section{Conclusion}
+
+Bien que les dotmatchers
+
+
+Une piste d'amélioration consisterait à améliorer l'algorithme glouton de construction du chemin hamiltonien. En effet, actuellement un temps important est utilisé pour construire un graphe complet, pour que finalement les arcs soient choisis 
 
 (+++ j'ai pas fait le blabla dans le SGA juste la table (pour l'instant je m'en occupe si tu veux)  - est ce que scinder l'intro est une bonne idée ? - est ce qu'il fut rajouter du contenu dans l'intro ? -  la répartition du travail est brève je sais aps si ça leur suffira -  j'ai refais le vote de consensus -  qualité du projet incomplet selon moi - pas d'inspi pour la conclusion +++)
 
