@@ -4,7 +4,7 @@
 \usepackage[utf8]{inputenc}  
 %\usepackage[T1]{fontenc}
 \usepackage[top = 3cm, left = 4cm, right = 4cm ]{geometry}
-\usepackage[pdftex]{graphicx}
+\usepackage{graphicx}
 \usepackage{fancyhdr}
 \usepackage{colortbl}
 \usepackage{xcolor}
@@ -67,7 +67,7 @@ Les fragments reçus en entrée sont des chaînes des caractères (dont la longu
 \section{Organisation du travail}
 
 Les différentes étapes du projet ont été implémentées dans l'ordre dans lequel elles sont présentées dans la section suivante. 
-L'implémentation d'une étape ne commençait qu'une fois l'étape précédente terminée et testée. Plutôt que d'assigner à chaque membre du groupe des parties entières du travail, nous travaillions simultanément sur les mêmes parties du projet. En conséquence, il est impossible de mettre en évidence une répartition claire des tâches. Cette approche nous a permis de nous concentrer successivement sur chacune des parties du projet. S'il fallait changer quelque chose à une étape précédente, les tests unitaires nous permettaient de vérifier que les changements ne corrompent pas le programme. \textcolor{red}{ De plus, avoir tous deux connaissance de l'implémentation précise des autres parties du projet permet de m}
+L'implémentation d'une étape ne commençait qu'une fois l'étape précédente terminée et testée. Plutôt que d'assigner à chaque membre du groupe des parties entières du travail, nous travaillions simultanément sur les mêmes parties du projet. En conséquence, il est impossible de mettre en évidence une répartition claire des tâches. Cette approche nous a permis de nous concentrer successivement sur chacune des parties du projet. S'il fallait changer quelque chose à une étape précédente, les tests unitaires nous permettaient de vérifier facilement que les changements ne corrompent pas le programme.
 
 L'outil $git$ a été utilisé pour le contrôle de version, et le projet a été implémenté sous \textit{java 11}.
 
@@ -87,12 +87,12 @@ Les sections suivantes sont consacrées à une explication plus approfondie de c
 
 \subsection{Alignement semi-global}
 
-L'alignement semi-global entre deux fragments est utilisé pour construire l'\textit{overlap graph}. \textcolor{red}{L'alignement semi-global vise à mesurer la ressemblance entre deux fragments sans pénaliser le décalage.} 
-
-C'est aussi à cette étape que sont détectées les inclusions entre fragments.
-
-\textcolor{red}{
-L'arc $f \to g$ dans l'\textit{overlap graph} aura pour poids le score de l'alignement semi-global dans lequel $f$ finit par des gaps et $g$ commence par des gaps lorsqu'ils sont alignés.}
+L'alignement semi-global vise à mesurer la ressemblance entre deux fragments sans pénaliser le décalage.
+Après avoir réalisé l'alignement semi-global entre deux fragments, plusieurs cas sont possibles:
+\begin{itemize}
+\item La fin d'un des fragments est alignée avec le début de l'autre. Dans ce cas, des gaps non pénalisants sont ajoutés à la fin du premier et au début du second. On parle d'alignement de $f$ vers $g$ si la fin de $f$ est alignée avec le début de $g$. Les arcs de l'\textit{overlap graph} sont définis selon cet alignement.
+\item Un des fragments est aligné avec un facteur de l'autre. Dans ce cas, le fragment le plus court sera considéré comme inclus à l'autre. L'inclusion considérée dans ce projet n'est donc pas une correspondance parfaite entre un facteur de $g$ et $f$, mais est définie selon l'alignement semi-global.
+\end{itemize}
 
 L'alignement semi-global optimal est calculé par programmation dynamique. 
 Le score de l'alignement entre deux fragments $f$ et $g$ est défini d'après les scores de l'alignement entre $f*$ et $g*$, où ces derniers sont les préfixes de taille $n-1$ respectifs de $f$ et $g$, i.e., $f*$ est $f$ sans son dernier caractère et similairement pour $g*$ et $g$.
@@ -113,7 +113,7 @@ où
 \end{itemize} 
 
 \newpage
-Le tableau suivant montre la matrice calculée pour déterminer les alignements $f \to g$ et $g \to f$, avec $f =$ acaatgatc et $g =$ caagatcagga (choisis arbitrairement).
+Pour illustrer par un exemple, le tableau suivant montre la matrice calculée pour déterminer les alignements $f \to g$ et $g \to f$, avec $f =$ acaatgatc et $g =$ caagatcagga.
 
 \begin{table}[h]
 	\centering
@@ -142,37 +142,36 @@ Le tableau suivant montre la matrice calculée pour déterminer les alignements 
 		C&0 & 1 & -1 & -3 & -2 & -1 & 2 & \cellcolor{lightred}5 & 3 & 1 & -1 & -3  \\
 		\hline 
 	\end{tabular}	
-	\caption{\textcolor{red}{Table de calcul de l'alignement semi-global avec $f$ = acaatgatc et $g$ = caagatcagga}}
+	\caption{Table de calcul de l'alignement semi-global avec $f$ = acaatgatc et $g$ = caagatcagga}
 \end{table}
 
-\textcolor{red}{L'alignement est reconstruit de la droite vers la gauche.}
 
-La reconstitution de l'alignement $f \to g$ est mise en évidence en rouge dans le tableau. Pour trouver l'alignement $f \to g$, on  commence depuis la case de score maximal dans la dernière ligne. 
-Partant de cette case, on va remonter le chemin vers la case $(0,0)$. Il s'agit de retrouver itérativement la case dont on vient parmi la case située à gauche, la case située au dessus et la case supérieure gauche.
-
-\textcolor{blue}{
-- Parler de comment on trouve les inclusions\\
-- Dire que les fragments qu'on utilise sont des tableaux de byte\\
-- La matrice de score est une matrice de short\\
-- parler de la complexité en temps et en espace de cette étape
-}
-
-$f \to g$
+\fbox{$f \to g$}
 \begin{verbatim}
 acaatgatc----
 -caa-gatcagga
 \end{verbatim}
-En partant de la i\up{e} case de la dernière ligne, on sait qu'on va aligner le dernier caractère de $f$ avec le i\up{e} caractère de $g$. 
 
-L'alignement $g \to f$ est construit en suivant les mêmes règles, mais en partant de la case de score maximal de la dernière colonne. Il est mis en évidence en vert dans le tableau.
-$g \to f$
+La reconstitution de l'alignement $f \to g$ est mise en évidence en rouge dans le tableau. Pour trouver l'alignement $f \to g$, on  commence depuis la case de score maximal dans la dernière ligne. Il s'agit ensuite de retrouver la case dont on vient parmi la case située à gauche, la case située au dessus et la case supérieure gauche. Cette étape est répétée de case en case jusqu'à arriver sur la première ligne ou la première colonne. Aller dans la case supérieure droite consiste à aligner deux caractères, tandis qu'aller vers la gauche ou le haut correspond à aligner un caractère avec un gap.
+
+Si en partant de la première ligne, on remonte jusqu'à la première ligne, cela signifie que $f$ est inclus à $g$. 
+En partant de la i\up{e} case de la dernière ligne, on sait qu'on va aligner le dernier caractère de $f$ avec le i\up{e} caractère de $g$. Et en arrivant sur la première ligne, on va aligner le premier caractère de $f$ avec un caractère de $g$. Sachant cela, on sait que $f$ a été aligné sur un facteur de $g$, et $f$ est donc considéré comme inclus à $g$.
+
+\fbox{$g \to f$}
 \begin{verbatim}
 caagatcagga--------
 ----------acaatgatc
 \end{verbatim}
 
+L'alignement $g \to f$ - en vert dans le tableau - est construit en suivant les mêmes règles, mais en partant de la case de score maximal de la dernière colonne. Il est mis en évidence en vert dans le tableau. 
+L'inclusion entre $g$ et $f$ est détectée si, en partant de la dernière colonne, on arrive dans la première colonne.
 
-Cette étape nécessite de calculer et stocker $n*m$ scores, avec $n$ et $m$ les tailles de $f$ et $g$. Pour éviter l'utilisation inutile de mémoire, les scores dans la matrice sont \textit{short}.
+
+Cette étape nécessite de calculer et stocker $n*m$ scores, avec $n$ et $m$ les tailles de $f$ et $g$.
+Pour reconstituer un alignement $f$ vers $g$ ou $g$ vers $f$, il faut parcourir autant de cases que de caractères ont été alignés, c'est à dire au maximum la taille du plus petit des deux fragments. La reconstitution d'un alignement se fait donc en $O(min(m, n))$.
+
+Pour éviter l'utilisation inutile de mémoire, les scores dans la matrice sont \textit{short}. Dans le même but, les fragments sont représentés dans des tableaux de \textit{byte}.
+\newpage
 
 \subsection{Overlap graph}
 
@@ -181,9 +180,6 @@ L'\textit{overlap graph} est un graphe orienté et pondéré dont les sommets so
 Pour construire ce graphe, il faut rechercher l'alignement semi-global optimal pour chaque paire de fragments du graphe (excepté les paires constituées d'un fragment et son complémentaire-inversé).
 
 De chaque sommet part un arc vers tous les autres - excepté son complémentaire-inversé. Il y a donc $n*(n-2)$ arcs à calculer (où $n$ est le nombre de sommets du graphe). On a pu voir à la section précédente qu'une seule matrice d'alignement permet de trouver à la fois l'arc $f\to g$ et l'arc $g \to f$. On sait aussi que les arcs $f \to g$ et $g' \to f'$  (avec $f'$ et $g'$ les complémentaires-inversés de $f$ et $g$) ont le même poids. Par conséquent, on peut calculer les poids des 8 arcs entre les sommets $f$, $f'$, $g$ et $g'$ en construisant uniquement deux matrices d'alignement semi-global. Au final $\frac{n*(n-2)}{8}$ matrices devront être construites.
-
-\textcolor{red}{
-S'il faut aussi considérer les fragments complémentaires-inversés dans le graphe, c'est parce les fragments issus du séquençage peuvent provenir du brin $3' \to 5'$ ou du brin $5' \to 3'$. Le problème d'assemblage de fragments consiste à reconstituer un seul des deux brins, ce qui demande d'écarter les fragments provenant du mauvais brin. }
 
 Certains fragments du graphe peuvent être inclus à d'autres. Ceci s'explique par le fait que les fragments peuvent provenir du brin $3' \to 5'$ ou du brin $5' \to 3'$. Prenons le cas de deux fragments $f$ et $g$ provenant chacun d'un brin différent, et correspondant tous deux à la même zone de la double-hélice d'ADN. Alors $f$ sera très similaire à $g'$. Dans ce cas, l'inclusion sera détectée lors de l'alignement semi-global, et le fragment le plus court sera considéré comme inclus à l'autre. 
 Nous avons pris le parti d'écarter du graphe un fragment dès que son inclusion à un autre fragment est détectée - le complémentaire-inversé est lui aussi écarté. C'est une manière non exacte d'écarter les fragments provenant du mauvais brin.
@@ -200,6 +196,8 @@ Par contre les arcs doivent indiquer, pour le nœud source comme pour le nœud d
 
 Notons que lors de la construction du graphe, on ne va pas reconstruire réellement l'alignement correspondant à chaque arc, mais seulement regarder le score lié à cet alignement pour pouvoir instancier l'arc. La correspondance entre un arc et l'alignement semi-global correspondant est effectuée juste avant l'étape de propagation d'étape. Ceci permet d'éviter de devoir stocker deux fragments (les versions alignées des fragments) pour chaque arc. 
 Comme désavantage, il faut recalculer les matrices d'alignement semi-global pour chaque arc du chemin hamiltonien, au moment de la propagation des gaps. Mais le nombre d'arcs concernés par la propagation des gaps est tellement petit par rapport au nombre total d'arcs que ce désavantage est négligeable.
+
+Globalement, la construction du graphe se fait donc en $O(n^2*l^2)$, avec $n$ le nombre de sommets du graphe et $l$ la taille maximale d'un fragment. En effet, il faut construire $\frac{n*(n-2)}{8}$ matrices, chacune nécessitant de calculer au pire $l^2$ scores.
 
 \subsection{Chemin hamiltonien}
 
@@ -225,7 +223,7 @@ Pendant le parcours, tous les arcs dont la source ou la destination est un fragm
 
 L'utilisation du multithreading à l'étape précédente rend non-déterministe l'ordre dans lequel les arcs sont ajoutés au tas. Pour cette raison, si l'arc utilise comme seul critère de tri le poids, il est impossible de savoir parmi deux arcs de même poids lequel sera considéré avant l'autre pendant le parcours du graphe. L'algorithme étant glouton, ce non-déterminisme a des conséquences importantes sur l'ensemble d'arcs choisi et donc sur le résultat final. Pour éviter cette situation, des critères ont été ajoutés pour trier les arcs. Le poids reste le premier critère, et les critères suivants n'interviennent qu'en cas d'égalité des poids. Ces critères sont arbitraires et ont pour seule utilité de garantir un résultat déterministe. Le premier de ces critères est l'indice du nœud source et le second (qui n'intervient qu'en cas d'égalité des deux précédents) est l'indice du nœud destination.
 
-
+\newpage
 \subsection{Propagation des gaps}
 
 L'étape de propagation des gaps consiste à aligner les différents fragments selon le chemin hamiltonien construit à l'étape précédente. Cette étape consiste donc à transformer l'ensemble d'arcs du chemin en un ensemble de fragments alignés. 
@@ -276,7 +274,7 @@ Pour effectuer ce tri, trois solutions ont été envisagées :
 C'est finalement la deuxième solution qui a été implémentée. D'après sa complexité, la première a été rapidement écartée (le pire cas des tables de hachage étant évitable grâce à un bon choix de la fonction de hachage et de la taille de la table). 
 La troisième solution a comme avantage sur la deuxième de permettre de commencer à partir d'un fragment quelconque. Par contre, elle nécessite une table occupant deux fois plus d'espace et elle rend plus complexe l'implémentation. La difficulté supplémentaire d'implémentation est liée au fait que si les arcs sont traités en partant du premier, propager les gaps vers le bas revient à insérer des gaps dans un seul fragment, alors que traiter les arcs en suivant le chemin à l'envers implique de pouvoir propager les gaps vers le bas sur plusieurs fragments.
 
-En itérant sur la liste des clés de la table qui contient le chemin, et en comparant chacune de ces clés avec l'entrée correspondante dans le tableau \textit{in} utilisé pour l'algorithme glouton, on peut trouver le premier arc du chemin en $O(n+m)$ (où $n$ est le nombre d'arcs et $m$ est la capacité de la \textit{HashMap}\footnote{\textcolor{red}{D'après la documentation java}}). En effet, la source du premier chemin est le seul nœud qui n'est pas une destination d'un arc du chemin, et donc le seul pour lequel l'entrée du tableau \textit{in} vaudra $0$. \textcolor{red}{dire que la capacité de la hashmap vaut n/0.75 car 0.75 est le facteur de charge par défaut, et que nous l'avons laissé comme ça}.
+En itérant sur la liste des clés de la table qui contient le chemin, et en comparant chacune de ces clés avec l'entrée correspondante dans le tableau \textit{in} utilisé pour l'algorithme glouton, on peut trouver le premier arc du chemin en $O(n+m)$ (où $n$ est le nombre d'arcs et $m$ est la capacité de la \textit{HashMap}\footnote{Itérer sur les clés d'une \textit{HashMap} se $O(n+m)$, d'après la documentation java}). En effet, la source du premier chemin est le seul nœud qui n'est pas une destination d'un arc du chemin, et donc le seul pour lequel l'entrée du tableau \textit{in} vaudra $0$. La \textit{HashMap} utilisée a facteur de charge de 75\% (valeur par défaut), donc $m$ vaudra au maximum $\frac{4n}{3}$. Par conséquent, trouver le premier arc du chemin se fait en un temps linéaire en la taille du chemin.
 
 Au vu du peu de temps nécessaire pour trouver le premier fragment, et tenant compte des autres avantages et défauts des deuxièmes et troisièmes solutions, nous avons choisi d'implémenter la deuxième.
 \\~\\ 
@@ -309,6 +307,7 @@ Dernière amélioration notable, on évite d'ajouter un par un les gaps de fin l
 
 Avec toutes ces modifications, l'étape de propagation se fait en $O(n*m)$, où $n$ est la taille du chemin hamiltonien et $m$ la taille maximale d'un fragment. En effet, on traite les $n$ fragments du chemin, et pour chacun d'eux on parcourt (en temps linéaire) uniquement la zone située entre les gaps du début et les gaps de fin. Dans la version précédente, ajouter un nouveau mot demandait d'ajouter un par un les $n$ gaps du début, et de propager sur tous les fragments déjà traités les gaps de fin. Si pour les petites instances le gain de temps n'a pas été déterminant - bien que non négligeable -, les changements ont permis de réduire le temps de propagation des gaps de plus d'une demi-heure à moins d'une demi-seconde.
 
+\newpage
 
 \subsection{Vote de consensus}
 
@@ -324,29 +323,29 @@ En cas d'égalité entre deux caractères, le caractère résultant est choisi s
 \section{Qualité du projet}
 
 \subsection{Efficacité en temps en mémoire}
-Pour évaluer la qualité de nos résultats, les séquences cibles liées à nos collections de test 
 
-Les tests unitaires, bien que non-exhaustifs, permettent quasiment d'avoir la certitude du bon fonctionnement de nos méthodes.
+Une grande attention a été portée aux efficacités en temps et en mémoire, notamment à travers la recherche des structures de données les plus adaptées à chaque étape. Pour l'étape de construction du graphe, la plus coûteuse en temps, la parallélisme permet un gain de temps non négligeable.
+
+Sur un processeur \textit{Intel Core i5 5200 U}, les temps d'exécution totaux mesurés sont inférieurs à 5 secondes pour les collection "10000" et "11200" et à 10 secondes pour la collection "16320". Pour la collection "$100000$", la construction du graphe prend moins de 7 minutes et la construction du chemin hamiltonien moins de 5 secondes. Les étapes de propagation des gaps et de vote de consensus nécessitent ensemble moins d'une seconde pour être réalisées.
 
 \subsection{\'Evaluation des résultats}
 
-Pour am
+Pour évaluer la qualité de nos résultats, les séquences cibles liées à nos collections de test sont comparées à nos résultats à l'aide de l'outil \textit{dotmatcher}. La séquence cible est comparée avec la séquence obtenue ainsi qu'avec la séquence complémentaire-inversée de cette dernière. En effet, un seul des deux brins est reconstitué et il se peut que la séquence cible corresponde au brin $5' \to 3'$ alors que la séquence résultat correspond au brin $3' \to 5'$.
 
+La figure \ref{dotplot} nous montre un dotplot comparant la séquence calculée à la séquence attendue, pour la collection 5 (taille 16320). On constate que la séquence résultat ne correspond pas vraiment à celle attendue, bien que des similarités existent. De manière générale, les résultats obtenus ne correspondent pas très bien avec ceux attendus. Néanmoins, les séquences calculées ont des tailles généralement proches des séquences cibles. Par contre, pour la collection de taille 100000, le résultat ne correspond vraiment pas à la séquence cible.
+
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{col16320.png}
+	\caption{Dotplot collection 5}
+	\label{dotplot}
+\centering
+\end{figure}
 
 \section{Conclusion}
 
-Bien que les dotmatchers
+L'attention particulière portée à l'efficacité du programme s'est avérée utile, avec des temps d'exécution très intéressants. Par contre, les résultats obtenus ne sont pas nécessairement très bons. Les tests unitaires (bien que non exhaustifs) permettent d'affirmer que les différentes étapes dont bien ce que nous attendons d'elles.
 
-
-Une piste d'amélioration consisterait à améliorer l'algorithme glouton de construction du chemin hamiltonien. En effet, actuellement un temps important est utilisé pour construire un graphe complet, pour que finalement les arcs soient choisis 
-
-(+++ j'ai pas fait le blabla dans le SGA juste la table (pour l'instant je m'en occupe si tu veux)  - est ce que scinder l'intro est une bonne idée ? - est ce qu'il fut rajouter du contenu dans l'intro ? -  la répartition du travail est brève je sais aps si ça leur suffira -  j'ai refais le vote de consensus -  qualité du projet incomplet selon moi - pas d'inspi pour la conclusion +++)
-
-utilisation de structure donné nouvelle
-
-progression nette7
-
-cependant - amélioration du résultat (lacune en bio)
+Une piste d'amélioration consisterait à envisager un algorithme de construction du chemin plus coûteux et donnant de meilleurs résultats. En effet, actuellement un temps important est utilisé pour construire un graphe complet, et un meilleur choix des arcs du chemin hamiltonien pourrait rendre plus "rentable" l'investissement en temps consacré à la construction du graphe.
 
 
 \end{document}
